@@ -1,20 +1,28 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Place</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    
+    <title>Event Places</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
- 
+
 <section class="bg" id="hero">
     <div class="container-lg" style="margin-bottom: 20%;">
         <div class="row align-items-center">
             <div class="col-sm-6 fade-in">
                 <h1 class="display- fw-bold" style="color: #FFFAB7;">Event Place Rental</h1>
-                <p style="color: whitesmoke;">Providing high end Place for your event!</p>
+                <p style="color: whitesmoke;">Providing high-end places for your event!</p>
                 <a class="btn btn-outline-light btn-lg" href="#products">Reserve NOW</a>
             </div>
         </div>
@@ -40,8 +48,7 @@
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
-                    // Output data of each row
-                    while($row = $result->fetch_assoc()) {
+                    while ($row = $result->fetch_assoc()) {
                         echo '
                         <div class="col-md-4">
                             <div class="card">

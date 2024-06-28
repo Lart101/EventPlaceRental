@@ -1,55 +1,35 @@
 <?php
-error_reporting(0); 
+session_start();
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "client_records";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if (isset($_SESSION['user_id'])) {
+    header('Location: event.php');
+    exit();
 }
 
-$message = "";
+// Database connection
+$conn = new mysqli("localhost", "root", "", "event_store");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST["username"];
-    $password = $_POST["password"];
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-    $sql = "SELECT * FROM clients WHERE username=?";
+    // Fetch user from database
+    $sql = "SELECT id, password FROM users WHERE username = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $username);
     $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt->bind_result($userId, $hashedPassword);
+    $stmt->fetch();
 
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        if (password_verify($password, $row["password"])) {
-            session_start();
-            setcookie("username", $username, time() + (86400 * 30), "/"); // Set cookie for 30 days
-            $_SESSION['login_time'] = time(); // Store the login time in session
-            $_SESSION['message'] = "Access Granted";
-            header("Location: ".$_SERVER['PHP_SELF']);
-            exit();
-        } else {
-            $message = "Password is incorrect";
-        }
+    if (password_verify($password, $hashedPassword)) {
+        $_SESSION['user_id'] = $userId;
+        header('Location: event.php');
+        exit();
     } else {
-        $message = "Username is incorrect";
+        $error = "Invalid username or password.";
     }
-}
 
-if (isset($_COOKIE['username'])) {
-    session_start();
-    if (!isset($_SESSION['page_count'])) {
-        $_SESSION['page_count'] = 0;
-        $_SESSION['creation_time'] = time();
-    } else {
-        $_SESSION['page_count']++;
-    }
-    $_SESSION['last_access'] = time();
+    $stmt->close();
 }
 
 $conn->close();
@@ -84,26 +64,28 @@ $conn->close();
 </head>
 
 <body>
-    <div class="container">
-        <div class="form-left">
-            <div class="title">Login</div>
-            <form id="loginForm" method="post" action="">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-
-                <div class="buttons">
-                    <button type="submit">Login</button>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h2>Login</h2>
+            <?php if (isset($error)): ?>
+                <div class="alert alert-danger"><?php echo $error; ?></div>
+            <?php endif; ?>
+            <form method="POST" action="">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" required>
                 </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
             </form>
-           
-            <div class="register-link">
-                <p>Don't have an account? <a href="register.php">Sign Up</a></p>
-            </div>
         </div>
     </div>
+</div>
+
     <div class='box'>
         <div class='wave -one'></div>
         <div class='wave -two'></div>
