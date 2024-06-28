@@ -12,21 +12,68 @@ if ($conn->connect_error) {
 
 $message = "";
 
+// Function to handle file upload
+function uploadImage($file) {
+    $target_dir = "uploads/";
+    // Create uploads folder if it doesn't exist
+    if (!file_exists($target_dir)) {
+        mkdir($target_dir, 0777, true);
+    }
+    $target_file = $target_dir . basename($file["name"]);
+    $uploadOk = 1;
+    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    
+    // Check if image file is a actual image or fake image
+    $check = getimagesize($file["tmp_name"]);
+    if ($check !== false) {
+        $uploadOk = 1;
+    } else {
+        $uploadOk = 0;
+    }
+    
+    // Check file size
+    if ($file["size"] > 5000000) {
+        $uploadOk = 0;
+    }
+    
+    // Allow certain file formats
+    if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+    && $imageFileType != "gif") {
+        $uploadOk = 0;
+    }
+    
+    // Check if $uploadOk is set to 0 by an error
+    if ($uploadOk == 0) {
+        return false;
+    // if everything is ok, try to upload file
+    } else {
+        if (move_uploaded_file($file["tmp_name"], $target_file)) {
+            return $target_file;
+        } else {
+            return false;
+        }
+    }
+}
+
 // Create operation
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create"])) {
     $name = $_POST["name"];
     $description = $_POST["description"];
     $location = $_POST["location"];
     $price_per_day = $_POST["price_per_day"];
-    $image = $_POST["image"];
+    $image = uploadImage($_FILES["image"]);
 
-    $sql = "INSERT INTO event_places (name, description, location, price_per_day, image)
-            VALUES ('$name', '$description', '$location', '$price_per_day', '$image')";
+    if ($image) {
+        $sql = "INSERT INTO event_places (name, description, location, price_per_day, image)
+                VALUES ('$name', '$description', '$location', '$price_per_day', '$image')";
 
-    if ($conn->query($sql) === TRUE) {
-        $message = "New place created successfully";
+        if ($conn->query($sql) === TRUE) {
+            $message = "New place created successfully";
+        } else {
+            $message = "Error: " . $sql . "<br>" . $conn->error;
+        }
     } else {
-        $message = "Error: " . $sql . "<br>" . $conn->error;
+        $message = "Error uploading image.";
     }
 }
 
@@ -37,9 +84,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
     $description = $_POST["description"];
     $location = $_POST["location"];
     $price_per_day = $_POST["price_per_day"];
-    $image = $_POST["image"];
-
-    $sql = "UPDATE event_places SET name='$name', description='$description', location='$location', price_per_day='$price_per_day', image='$image' WHERE id=$id";
+    
+    // Check if a new image is uploaded
+    if (!empty($_FILES["image"]["name"])) {
+        $image = uploadImage($_FILES["image"]);
+        if ($image) {
+            $sql = "UPDATE event_places SET name='$name', description='$description', location='$location', price_per_day='$price_per_day', image='$image' WHERE id=$id";
+        } else {
+            $message = "Error uploading image.";
+        }
+    } else {
+        $sql = "UPDATE event_places SET name='$name', description='$description', location='$location', price_per_day='$price_per_day' WHERE id=$id";
+    }
 
     if ($conn->query($sql) === TRUE) {
         $message = "Place updated successfully";
@@ -136,7 +192,7 @@ $conn->close();
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form id="createEventPlaceForm" method="post" action="">
+                            <form id="createEventPlaceForm" method="post" action="" enctype="multipart/form-data">
                                 <input type="hidden" name="create" value="1">
                                 
                                 <label for="name">Name:</label>
@@ -151,9 +207,9 @@ $conn->close();
                                 <label for="price_per_day">Price Per Day:</label>
                                 <input type="number" id="price_per_day" name="price_per_day" required>
                                 
-                                <label for="image">Image URL:</label>
-                                <input type="text" id="image" name="image" required>
-                                
+                                <label for="image">Image:</label>
+                                <input type="file" id="image" name="image" required>
+
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                     <button type="submit" class="btn btn-primary">Create Place</button>
@@ -175,7 +231,7 @@ $conn->close();
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form id="editEventPlaceForm" method="post" action="">
+                            <form id="editEventPlaceForm" method="post" action="" enctype="multipart/form-data">
                                 <input type="hidden" name="update" value="1">
                                 <input type="hidden" id="edit_event_place_id" name="id">
 
@@ -191,8 +247,8 @@ $conn->close();
                                 <label for="edit_price_per_day">Price Per Day:</label>
                                 <input type="number" id="edit_price_per_day" name="price_per_day" required>
 
-                                <label for="edit_image">Image URL:</label>
-                                <input type="text" id="edit_image" name="image" required>
+                                <label for="edit_image">Image:</label>
+                                <input type="file" id="edit_image" name="image">
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -253,4 +309,3 @@ $conn->close();
     </script>
 </body>
 </html>
-
