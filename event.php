@@ -52,7 +52,7 @@ if (!isset($_SESSION['user_id'])) {
                         echo '
                         <div class="col-md-4">
                             <div class="card">
-                                <img src="img/products/' . $row["image"] . '" class="card-img-top" alt="' . $row["name"] . '">
+                                <img src="' . $row["image"] . '" class="card-img-top" alt="' . $row["name"] . '">
                                 <div class="card-body">
                                     <h5 class="card-title">' . $row["name"] . '</h5>
                                     <p class="card-text">' . $row["description"] . '</p>
@@ -74,7 +74,4 @@ if (!isset($_SESSION['user_id'])) {
 
 <div id="notification" class="notification"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-<script async data-id="9364713225" id="chatling-embed-script" type="text/javascript" src="https://chatling.ai/js/embed.js"></script>
-</body>
-</html>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anony
