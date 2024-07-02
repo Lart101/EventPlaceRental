@@ -6,6 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Place</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .reserved-dates {
+            margin-top: 20px;
+        }
+
+        .reserved-dates ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .reserved-dates ul li {
+            display: inline-block;
+            margin-right: 10px;
+            background-color: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -42,6 +60,22 @@ $stmt->execute();
 $stmt->bind_result($name, $description, $location, $price_per_day, $image);
 $stmt->fetch();
 $stmt->close();
+
+// Fetch already reserved dates for this event place
+$reservedDatesSql = "SELECT start_date, end_date FROM reservations WHERE event_place_id = ?";
+$reservedDatesStmt = $conn->prepare($reservedDatesSql);
+$reservedDatesStmt->bind_param("i", $eventPlaceId);
+$reservedDatesStmt->execute();
+$reservedDatesStmt->bind_result($reservedStartDate, $reservedEndDate);
+
+$reservedDates = [];
+while ($reservedDatesStmt->fetch()) {
+    $reservedDates[] = [
+        'start_date' => $reservedStartDate,
+        'end_date' => $reservedEndDate
+    ];
+}
+$reservedDatesStmt->close();
 $conn->close();
 ?>
 
@@ -62,7 +96,7 @@ $conn->close();
             <p><?php echo $description; ?></p>
             <p><strong>Location:</strong> <?php echo $location; ?></p>
             <p><strong>Price per day:</strong> ₱<?php echo $price_per_day; ?></p>
-            <form id="reservationForm" method="POST" action="reserve.php" onsubmit="return showReservationModal()">
+            <form id="reservationForm" method="POST" action="reserve.php" onsubmit="return validateReservation()">
                 <input type="hidden" name="event_place_id" value="<?php echo $eventPlaceId; ?>">
                 <input type="hidden" id="price_per_day" value="<?php echo $price_per_day; ?>">
                 <div class="mb-3">
@@ -87,33 +121,25 @@ $conn->close();
     </div>
 </div>
 
-<!-- Reservation Modal -->
-<div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reservationModalLabel">Reservation Summary</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-7">
-                            <h5>Total Price: <span id="modalTotalPrice"></span></h5>
-                            <h5>Reservation Fee: <span id="modalReservationFee"></span></h5>
-                        </div>
-                        <div class="col-md-5">
-                            <img src="<?php echo $image; ?>" class="img-fluid" alt="<?php echo $name; ?>">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="confirmReservation()">Confirm Reservation</button>
-            </div>
-        </div>
+<!-- Reserved Dates Section -->
+<div class="container mt-5 reserved-dates">
+    <h2>Already Reserved Dates</h2>
+    <ul>
+    <?php if (!empty($reservedDates)): ?>
+    <div class="container mt-5 reserved-dates">
+       
+        <ul>
+            <?php foreach ($reservedDates as $reserved): ?>
+                <li><?php echo date('M d, Y', strtotime($reserved['start_date'])) . ' - ' . date('M d, Y', strtotime($reserved['end_date'])); ?></li>
+            <?php endforeach; ?>
+        </ul>
     </div>
+<?php else: ?>
+    <div class="container mt-5 reserved-dates">
+        <p>No dates have been reserved yet for this event place.</p>
+    </div>
+<?php endif; ?>
+    </ul>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -146,26 +172,46 @@ $conn->close();
             endDateInput.value = '';
             calculatePrices(); // Recalculate prices if end date is cleared
         }
+
+        // Disable reserved dates in date picker
+        disableReservedDates();
     });
 
     document.getElementById('end_date').addEventListener('change', calculatePrices);
 
-    function showReservationModal() {
-        calculatePrices(); // Calculate prices before showing modal
-        const totalPrice = document.getElementById('total_price').value;
-        const reservationFee = document.getElementById('reservation_fee').value;
+    function disableReservedDates() {
+        const reservedDates = <?php echo json_encode($reservedDates); ?>;
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
 
-        document.getElementById('modalTotalPrice').textContent = totalPrice;
-        document.getElementById('modalReservationFee').textContent = reservationFee;
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
 
-        var myModal = new bootstrap.Modal(document.getElementById('reservationModal'));
-        myModal.show();
+        for (let i = 0; i < reservedDates.length; i++) {
+            const reservedStart = new Date(reservedDates[i]['start_date']);
+            const reservedEnd = new Date(reservedDates[i]['end_date']);
 
-        return false; // Prevent form submission for now
+            if (startDate && endDate) {
+                // Check if the selected range overlaps with any reserved range
+                if (!(endDate < reservedStart || startDate > reservedEnd)) {
+                    endDateInput.value = ''; // Clear end date if overlap found
+                    alert('This date range includes already reserved dates. Please select another range.');
+                    return;
+                }
+            }
+        }
     }
 
-    function confirmReservation() {
-        document.getElementById('reservationForm').submit();
+    function validateReservation() {
+        // Check if end date is disabled (indicating it's cleared due to overlap)
+        if (document.getElementById('end_date').disabled) {
+            alert('Please select valid dates.');
+            return false;
+        }
+
+        // Proceed with form submission
+        calculatePrices();
+        return true;
     }
 </script>
 
