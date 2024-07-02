@@ -104,8 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
             echo '<script>alert("Profile updated."); window.location.replace("profile.php");</script>';
             exit();
         } else {
-            // Display an error message
-            echo '<script>alert("Failed to update profile. Please try again.");</script>';
+            
         }
     }
     $stmt->close();
@@ -247,28 +246,37 @@ $conn->close();
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="editUsername" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="editUsername" name="username"
-                                value="<?php echo htmlspecialchars($username); ?>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editEmail" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="editEmail" name="email"
-                                value="<?php echo htmlspecialchars($email); ?>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editPassword" class="form-label">New Password</label>
-                            <input type="password" class="form-control" id="editPassword" name="password"
-                                pattern="^(?=.*[a-z])(?=.*[A-Z]).{6,14}$"
-                                title="Password must be between 6 and 14 characters long and include at least one uppercase and one lowercase letter."
-                                value="<?php echo isset($current_password) ? htmlspecialchars($current_password) : ''; ?>"
-                                required>
-                            <div class="invalid-feedback">
-                                Please provide a valid password.
-                            </div>
-                        </div>
-                    </div>
+    <div class="mb-3">
+        <label for="editUsername" class="form-label">Username</label>
+        <input type="text" class="form-control" id="editUsername" name="username" value="<?php echo htmlspecialchars($username); ?>" required>
+    </div>
+    <div class="mb-3">
+        <label for="editEmail" class="form-label">Email</label>
+        <input type="email" class="form-control" id="editEmail" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
+    </div>
+    <div class="mb-3">
+        <label for="editPassword" class="form-label">New Password</label>
+        <div class="input-group">
+            <input type="password" class="form-control" id="editPassword" name="password" 
+                   pattern="^(?=.*[a-z])(?=.*[A-Z]).{6,14}$"
+                   title="Password must be between 6 and 14 characters long and include at least one uppercase and one lowercase letter."
+                   value="<?php echo isset($current_password) ? htmlspecialchars($current_password) : ''; ?>"
+                   required>
+           <!-- Example usage -->
+<button class="btn btn-outline-secondary" type="button" id="togglePassword" onclick="togglePasswordVisibility()">
+    <svg id="toggleIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+    </svg>
+</button>
+
+        </div>
+        <div class="invalid-feedback">
+            Please provide a valid password.
+        </div>
+    </div>
+</div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" name="update_profile">Save changes</button>
@@ -281,6 +289,23 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+        <script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('editPassword');
+        const icon = document.getElementById('toggleIcon');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
+</script>
+
 
 </body>
 
