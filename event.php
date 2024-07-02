@@ -12,8 +12,9 @@ if (!isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Places</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Event Venue</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="event.css" rel="stylesheet">
 </head>
 <body>
 
@@ -21,7 +22,7 @@ if (!isset($_SESSION['user_id'])) {
     <div class="container-lg" style="margin-bottom: 20%;">
         <div class="row align-items-center">
             <div class="col-sm-6 fade-in">
-                <h1 class="display- fw-bold" style="color: #FFFAB7;">Event Place Rental</h1>
+                <h1 class="display- fw-bold" style="color: #FFFAB7;">Event Venue Rental</h1>
                 <p style="color: whitesmoke;">Providing high-end places for your event!</p>
                 <a class="btn btn-outline-light btn-lg" href="#products">Reserve NOW</a>
             </div>
@@ -32,7 +33,7 @@ if (!isset($_SESSION['user_id'])) {
 <div class="container">
     <section id="products" class="py-5 fade-in">
         <div class="container">
-            <h1 class="my-4 text-center">Our Places</h1>
+            <h1 class="my-4 text-center">Our Venue</h1>
             <div class="row">
                 <?php
                 // Database connection
@@ -74,4 +75,4 @@ if (!isset($_SESSION['user_id'])) {
 
 <div id="notification" class="notification"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anony
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

@@ -40,7 +40,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="style1.css">
+    <link rel="stylesheet" href="login.css">
     <style>
         .notification {
             display: none;
@@ -67,7 +67,7 @@ $conn->close();
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-6 offset-md-3">
-            <h2>Login</h2>
+            <h1>Login</h1>
             <?php if (isset($error)): ?>
                 <div class="alert alert-danger"><?php echo $error; ?></div>
             <?php endif; ?>
