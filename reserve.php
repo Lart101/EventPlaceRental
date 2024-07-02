@@ -37,12 +37,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare("INSERT INTO reservations (user_id, event_place_id, start_date, end_date, total_price, reservation_fee) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("iissdd", $userId, $eventPlaceId, $startDate, $endDate, $totalPrice, $reservationFee);
     if ($stmt->execute()) {
-        echo "Reservation successful!";
+        // Reservation successful
+        $_SESSION['reservation_success'] = true;
     } else {
+        // Reservation failed
         echo "Error: " . $stmt->error;
     }
     $stmt->close();
 }
 
 $conn->close();
+
+// Redirect back to the event place page or wherever appropriate
+header('Location: event_place.php?id=' . $eventPlaceId);
+exit();
 ?>

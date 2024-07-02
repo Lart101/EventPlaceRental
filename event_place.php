@@ -1,35 +1,40 @@
-<?php
-session_start();
-
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Place</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
 
 <?php
-// Database connection
+// Session check and database connection code
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
+}
+
+if (isset($_SESSION['reservation_success']) && $_SESSION['reservation_success']) {
+    // Display JavaScript alert for success notification
+    echo '<script>alert("Reservation successful!");</script>';
+
+    // Unset the session variable to avoid displaying the alert on page refresh
+    unset($_SESSION['reservation_success']);
+}
+
 $conn = new mysqli("localhost", "root", "", "event_store");
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get event place ID from URL
 $eventPlaceId = $_GET['id'];
 
-// Fetch event place details
 $sql = "SELECT name, description, location, price_per_day, image FROM event_places WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $eventPlaceId);
@@ -57,16 +62,16 @@ $conn->close();
             <p><?php echo $description; ?></p>
             <p><strong>Location:</strong> <?php echo $location; ?></p>
             <p><strong>Price per day:</strong> ₱<?php echo $price_per_day; ?></p>
-            <form id="reservationForm" method="POST" action="reserve.php">
+            <form id="reservationForm" method="POST" action="reserve.php" onsubmit="return showReservationModal()">
                 <input type="hidden" name="event_place_id" value="<?php echo $eventPlaceId; ?>">
                 <input type="hidden" id="price_per_day" value="<?php echo $price_per_day; ?>">
                 <div class="mb-3">
                     <label for="start_date" class="form-label">Start Date:</label>
-                    <input type="date" id="start_date" name="start_date" class="form-control" required>
+                    <input type="date" id="start_date" name="start_date" class="form-control" min="<?php echo date('Y-m-d'); ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="end_date" class="form-label">End Date:</label>
-                    <input type="date" id="end_date" name="end_date" class="form-control" required>
+                    <input type="date" id="end_date" name="end_date" class="form-control" disabled required>
                 </div>
                 <div class="mb-3">
                     <label for="total_price" class="form-label">Total Price:</label>
@@ -78,6 +83,35 @@ $conn->close();
                 </div>
                 <button type="submit" class="btn btn-primary">Reserve Now</button>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Reservation Modal -->
+<div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reservationModalLabel">Reservation Summary</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <h5>Total Price: <span id="modalTotalPrice"></span></h5>
+                            <h5>Reservation Fee: <span id="modalReservationFee"></span></h5>
+                        </div>
+                        <div class="col-md-5">
+                            <img src="<?php echo $image; ?>" class="img-fluid" alt="<?php echo $name; ?>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="confirmReservation()">Confirm Reservation</button>
+            </div>
         </div>
     </div>
 </div>
@@ -100,8 +134,41 @@ $conn->close();
         }
     }
 
-    document.getElementById('start_date').addEventListener('change', calculatePrices);
+    document.getElementById('start_date').addEventListener('change', function() {
+        const startDate = new Date(this.value);
+        const endDateInput = document.getElementById('end_date');
+
+        endDateInput.disabled = false; // Enable end date input
+        endDateInput.min = this.value; // Set min date for end date based on start date
+
+        // Clear end date value if it's before the start date
+        if (endDateInput.value && new Date(endDateInput.value) < startDate) {
+            endDateInput.value = '';
+            calculatePrices(); // Recalculate prices if end date is cleared
+        }
+    });
+
     document.getElementById('end_date').addEventListener('change', calculatePrices);
+
+    function showReservationModal() {
+        calculatePrices(); // Calculate prices before showing modal
+        const totalPrice = document.getElementById('total_price').value;
+        const reservationFee = document.getElementById('reservation_fee').value;
+
+        document.getElementById('modalTotalPrice').textContent = totalPrice;
+        document.getElementById('modalReservationFee').textContent = reservationFee;
+
+        var myModal = new bootstrap.Modal(document.getElementById('reservationModal'));
+        myModal.show();
+
+        return false; // Prevent form submission for now
+    }
+
+    function confirmReservation() {
+        document.getElementById('reservationForm').submit();
+    }
 </script>
+
 </body>
+
 </html>
