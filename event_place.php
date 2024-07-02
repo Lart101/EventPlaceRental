@@ -151,7 +151,7 @@ $conn->close();
         const endDate = new Date(document.getElementById('end_date').value);
 
         if (startDate && endDate && endDate >= startDate) {
-            const days = (endDate - startDate) / (1000 * 60 * 60 * 24) + 1; // Include end date
+            const days = (endDate - startDate) / (1000 * 60 * 60 * 24) + 1; 
             const totalPrice = days * pricePerDay;
             const reservationFee = totalPrice * 0.05;
 
@@ -164,16 +164,16 @@ $conn->close();
         const startDate = new Date(this.value);
         const endDateInput = document.getElementById('end_date');
 
-        endDateInput.disabled = false; // Enable end date input
-        endDateInput.min = this.value; // Set min date for end date based on start date
+        endDateInput.disabled = false; 
+        endDateInput.min = this.value; 
 
-        // Clear end date value if it's before the start date
+     
         if (endDateInput.value && new Date(endDateInput.value) < startDate) {
             endDateInput.value = '';
-            calculatePrices(); // Recalculate prices if end date is cleared
+            calculatePrices(); 
         }
 
-        // Disable reserved dates in date picker
+   
         disableReservedDates();
     });
 
@@ -192,7 +192,7 @@ $conn->close();
             const reservedEnd = new Date(reservedDates[i]['end_date']);
 
             if (startDate && endDate) {
-                // Check if the selected range overlaps with any reserved range
+                
                 if (!(endDate < reservedStart || startDate > reservedEnd)) {
                     endDateInput.value = ''; // Clear end date if overlap found
                     alert('This date range includes already reserved dates. Please select another range.');
@@ -203,7 +203,7 @@ $conn->close();
     }
 
     function validateReservation() {
-        // Check if end date is disabled (indicating it's cleared due to overlap)
+        
         if (document.getElementById('end_date').disabled) {
             alert('Please select valid dates.');
             return false;
