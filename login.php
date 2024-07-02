@@ -82,6 +82,9 @@ $conn->close();
                 </div>
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>
+            <div class="register-link">
+                <p>Don't have an account? <a href="register.php">register</a></p>
+            </div>
         </div>
     </div>
 </div>
