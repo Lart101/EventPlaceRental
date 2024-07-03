@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($insert_stmt->execute()) {
                 $message = "New record created successfully";
-               
+
                 $username = $password = $first_name = $middle_name = $last_name = $email = $date_of_birth = $gender = $contact_number = $barangay = $city = $blk = "";
             } else {
                 $message = "Error: " . $insert_stmt->error;
@@ -129,15 +129,15 @@ $conn->close();
         .field-group {
             margin-bottom: 15px;
         }
+
         #gender {
-    display: inline-block; 
-}
+            display: inline-block;
+        }
 
-#gender label {
-    display: inline-block; 
-    margin-right: 20px;
-}
-
+        #gender label {
+            display: inline-block;
+            margin-right: 20px;
+        }
     </style>
 </head>
 
@@ -194,16 +194,17 @@ $conn->close();
                     <span id="dobError" class="error-message"></span>
 
                     <label for="gender">Gender:</label>
-<fieldset id="gender" name="gender" required>
-    <label><input type="radio" name="gender" value="male" <?php echo ($gender === 'male') ? 'checked' : ''; ?>> Male</label>
-    <label><input type="radio" name="gender" value="female" <?php echo ($gender === 'female') ? 'checked' : ''; ?>> Female</label>
-    <label><input type="radio" name="gender" value="other" <?php echo ($gender === 'other') ? 'checked' : ''; ?>> Other</label>
-</fieldset>
+                    <fieldset id="gender" name="gender" required>
+                        <label><input type="radio" name="gender" value="male" <?php echo ($gender === 'male') ? 'checked' : ''; ?>> Male</label>
+                        <label><input type="radio" name="gender" value="female" <?php echo ($gender === 'female') ? 'checked' : ''; ?>> Female</label>
+                        <label><input type="radio" name="gender" value="other" <?php echo ($gender === 'other') ? 'checked' : ''; ?>> Other</label>
+                    </fieldset>
 
                     <span id="genderError" class="error-message"></span>
 
                     <label for="age">Age:</label>
-                    <input type="text" id="age" name="age" readonly value="<?php echo isset($age) ? htmlspecialchars($age) : ''; ?>">
+                    <input type="text" id="age" name="age" readonly
+                        value="<?php echo isset($age) ? htmlspecialchars($age) : ''; ?>">
 
                     <span id="ageError" class="error-message"></span>
 
@@ -258,7 +259,7 @@ $conn->close();
             notification.style.display = 'none';
         }, 5000);
 
-        
+
 
         function calculateAge() {
             var dob = document.getElementById('date_of_birth').value;
@@ -269,7 +270,7 @@ $conn->close();
             if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
                 age--;
             }
-            
+
             document.getElementById('age').value = age;
         }
 
