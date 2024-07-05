@@ -11,68 +11,40 @@ $response = ['status' => 'error', 'message' => 'Unknown error'];
 
 try {
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['message'])) {
-            // Process Contact Form
+        if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['message']) && isset($_POST['rating'])) {
+            // Process Form
             $name = $_POST['name'];
             $email = $_POST['email'];
             $message = $_POST['message'];
-
-            // Instantiate PHPMailer for contact form
-            $mailContact = new PHPMailer(true);
-
-            // Server settings
-            $mailContact->isSMTP();
-            $mailContact->Host       = 'smtp.gmail.com';
-            $mailContact->SMTPAuth   = true;
-            $mailContact->Username   = 'boardmart020@gmail.com';
-            $mailContact->Password   = 'wojvwvhystherxdb';
-            $mailContact->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mailContact->Port       = 587;
-
-            // Recipients
-            $mailContact->setFrom('boardmart020@gmail.com', 'Board Mart');
-            $mailContact->addAddress('boardmart020@gmail.com', 'Recipient Name');
-
-            // Content
-            $mailContact->isHTML(true);
-            $mailContact->Subject = 'New Contact Form Submission';
-            $mailContact->Body    = "<p>Name: $name</p><p>Email: $email</p><p>Message: $message</p>";
-            $mailContact->AltBody = "Name: $name\nEmail: $email\nMessage: $message";
-
-            // Send email
-            $mailContact->send();
-            $response = ['status' => 'success', 'message' => 'Contact message has been sent successfully!'];
-        } elseif (isset($_POST['rating'])) {
-            // Process Review Form
             $rating = $_POST['rating'];
 
-            // Instantiate PHPMailer for review form
-            $mailReview = new PHPMailer(true);
+            // Instantiate PHPMailer for sending the email
+            $mail = new PHPMailer(true);
 
             // Server settings
-            $mailReview->isSMTP();
-            $mailReview->Host       = 'smtp.gmail.com';
-            $mailReview->SMTPAuth   = true;
-            $mailReview->Username   = 'boardmart020@gmail.com';
-            $mailReview->Password   = 'wojvwvhystherxdb';
-            $mailReview->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mailReview->Port       = 587;
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'boardmart020@gmail.com';
+            $mail->Password   = 'wojvwvhystherxdb';
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
 
             // Recipients
-            $mailReview->setFrom('boardmart020@gmail.com', 'Board Mart');
-            $mailReview->addAddress('boardmart020@gmail.com', 'Feedback');
+            $mail->setFrom('boardmart020@gmail.com', 'Board Mart');
+            $mail->addAddress('boardmart020@gmail.com', 'Recipient Name');
 
             // Content
-            $mailReview->isHTML(true);
-            $mailReview->Subject = 'New Review and Feedback Submission';
-            $mailReview->Body    = "<p>Rating: $rating</p>";
-            $mailReview->AltBody = "Rating: $rating";
+            $mail->isHTML(true);
+            $mail->Subject = 'New Contact Form Submission';
+            $mail->Body    = "<p>Name: $name</p><p>Email: $email</p><p>Message: $message</p><p>Rating: $rating</p>";
+            $mail->AltBody = "Name: $name\nEmail: $email\nMessage: $message\nRating: $rating";
 
             // Send email
-            $mailReview->send();
-            $response = ['status' => 'success', 'message' => 'Review submitted successfully. Thank you!'];
+            $mail->send();
+            $response = ['status' => 'success', 'message' => 'Your message and review have been sent successfully!'];
         } else {
-            $response['message'] = 'Invalid form submission.';
+            $response['message'] = 'Please fill in all fields.';
         }
     } else {
         $response['message'] = 'Invalid request method.';
