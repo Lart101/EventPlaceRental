@@ -6,30 +6,47 @@ if (isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Database connection
 $conn = new mysqli("localhost", "root", "", "event_store");
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$error = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Fetch user from database
+
     $sql = "SELECT id, password FROM users WHERE username = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->bind_result($userId, $hashedPassword);
-    $stmt->fetch();
+    if ($stmt) {
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->bind_result($userId, $storedPassword);
+        $stmt->fetch();
 
-    if (password_verify($password, $hashedPassword)) {
-        $_SESSION['user_id'] = $userId;
-        header('Location: event.php');
-        exit();
+  
+        if ($userId) {
+            echo "User ID: $userId<br>";
+            echo "Stored Password: $storedPassword<br>";
+        } else {
+            echo "No user found with username: $username<br>";
+        }
+
+        if ($password === $storedPassword) {
+            $_SESSION['user_id'] = $userId;
+            header('Location: event.php');
+            exit();
+        } else {
+            $error = "Invalid username or password.";
+        }
+
+        $stmt->close();
     } else {
-        $error = "Invalid username or password.";
+        $error = "Failed to prepare the SQL statement: " . $conn->error;
     }
-
-    $stmt->close();
 }
 
 $conn->close();
@@ -68,7 +85,7 @@ $conn->close();
     <div class="row">
         <div class="col-md-6 offset-md-3">
             <h1>Login</h1>
-            <?php if (isset($error)): ?>
+            <?php if (!empty($error)): ?>
                 <div class="alert alert-danger"><?php echo $error; ?></div>
             <?php endif; ?>
             <form method="POST" action="">
@@ -89,21 +106,23 @@ $conn->close();
     </div>
 </div>
 
-    <div class='box'>
-        <div class='wave -one'></div>
-        <div class='wave -two'></div>
-        <div class='wave -three'></div>
-    </div>
+<div id="notification" class="notification error"><?php echo $error; ?></div>
 
-    <script>
-        var message = "<?php echo $message; ?>";
-        if (message.trim() !== "") {
-            var notification = document.getElementById('notification');
-            notification.style.display = 'block';
-            setTimeout(function() {
-                notification.style.display = 'none';
-            }, 5000); 
-        }
-    </script>
+<div class='box'>
+    <div class='wave -one'></div>
+    <div class='wave -two'></div>
+    <div class='wave -three'></div>
+</div>
+
+<script>
+    var message = "<?php echo $error; ?>";
+    if (message.trim() !== "") {
+        var notification = document.getElementById('notification');
+        notification.style.display = 'block';
+        setTimeout(function() {
+            notification.style.display = 'none';
+        }, 5000); 
+    }
+</script>
 </body>
 </html>
