@@ -47,7 +47,7 @@ function uploadImage($file, $is_multiple = false)
     }
 }
 
-// Create operation
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create"])) {
     $package_name = $_POST["package_name"];
     $price = $_POST["price"];
@@ -73,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create"])) {
     }
 }
 
-// Update operation
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
     $id = $_POST["id"];
     $package_name = $_POST["package_name"];
@@ -257,22 +257,22 @@ $conn->close();
                                     </div>
                                 </td>
                                 <td>
-                                    <button class="btn btn-primary btn-sm edit-package-btn" data-toggle="modal"
-                                        data-target="#editPackageModal" data-id="<?php echo $package['id']; ?>"
-                                        data-package_name="<?php echo $package['package_name']; ?>"
-                                        data-price="<?php echo $package['price']; ?>"
-                                        data-duration="<?php echo $package['duration']; ?>"
-                                        data-max_pax="<?php echo $package['max_pax']; ?>"
-                                        data-inclusions="<?php echo $package['inclusions']; ?>">Edit</button>
-                                    <a href="?delete=<?php echo $package['id']; ?>" class="btn btn-danger btn-sm">Delete</a>
-                                </td>
+    <button class="btn btn-primary btn-sm edit-package-btn" data-toggle="modal"
+        data-target="#editPackageModal" data-id="<?php echo $package['id']; ?>"
+        data-package_name="<?php echo $package['package_name']; ?>"
+        data-price="<?php echo $package['price']; ?>"
+        data-duration="<?php echo $package['duration']; ?>"
+        data-max_pax="<?php echo $package['max_pax']; ?>"
+        data-inclusions="<?php echo $package['inclusions']; ?>">Edit</button>
+    <a href="?delete=<?php echo $package['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this package?')" style="margin-top: 10px;">Delete</a>
+</td>
                             </tr>
                         <?php } ?>
                     </tbody>
 
 
             </div>
-            <!-- Image Viewer Modal -->
+        
             <div class="modal fade" id="imageViewerModal" tabindex="-1" role="dialog"
                 aria-labelledby="imageViewerModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
@@ -284,7 +284,7 @@ $conn->close();
                             </button>
                         </div>
                         <div class="modal-body" id="imageViewerBody">
-                            <!-- Images will be dynamically added here -->
+                          
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -293,7 +293,6 @@ $conn->close();
                 </div>
             </div>
 
-            <!-- Create Package Modal -->
             <div class="modal fade" id="createPackageModal" tabindex="-1" role="dialog"
                 aria-labelledby="createPackageModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -339,7 +338,7 @@ $conn->close();
                 </div>
             </div>
 
-            <!-- Edit Package Modal -->
+            
             <div class="modal fade" id="editPackageModal" tabindex="-1" role="dialog"
                 aria-labelledby="editPackageModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -420,12 +419,12 @@ $conn->close();
                 var img = document.createElement('img');
                 img.src = image.trim();
                 img.alt = 'Multiple Image';
-                img.style.width = '100%'; // Adjust width as needed
-                img.style.height = 'auto'; // Maintain aspect ratio
+                img.style.width = '100%'; 
+                img.style.height = 'auto'; 
                 modalBody.appendChild(img);
             });
 
-            $('#imageViewerModal').modal('show'); // Show Bootstrap modal
+            $('#imageViewerModal').modal('show'); 
         }
     </script>
 

@@ -1,3 +1,8 @@
+<?php 
+  session_start();
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -80,6 +85,25 @@
             display: none;
             z-index: 9999;
         }
+        .nav-item.login {
+            margin-left: auto; 
+        }
+
+        .nav-item.login a {
+            color: #007bff;
+        }
+
+        .nav-item.logout button {
+            color: #dc3545; 
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-item.logout button:hover {
+            color: #fff;
+            background-color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -90,7 +114,6 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-lg">
             <a class="navbar-brand" href="#">
@@ -104,11 +127,30 @@
                 <div class="mx-auto">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link" href="event.php">Services</a>
+                            <a class="nav-link" href="swimming_packages.php">Packages</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Contact</a>
+                            <a class="nav-link" href="contactmain.php">Contact</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="profilecopy.php">Profile</a>
+                        </li>
+                        <?php
+                      
+                        if (!isset($_SESSION['user_id'])):
+                        ?>
+                         
+                            <li class="nav-item login">
+                                <a class="nav-link" href="login.php">Login</a>
+                            </li>
+                        <?php else: ?>
+                            
+                            <li class="nav-item logout">
+                                <form action="logout.php" method="POST">
+                                    <button type="submit" class="nav-link btn btn-link" onclick="return confirmLogout()">Logout</button>
+                                </form>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </div>
@@ -265,6 +307,12 @@
                 showNotification('danger', 'An error occurred while sending your message.');
             });
         });
+    </script>
+
+<script>
+    function confirmLogout() {
+        return confirm('Are you sure you want to logout?');
+    }
     </script>
 </body>
 </html>

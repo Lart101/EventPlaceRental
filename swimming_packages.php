@@ -14,10 +14,61 @@ if (!isset($_SESSION['user_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swimming Packages</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link href="event.css" rel="stylesheet">
+    <link href="default.css" rel="stylesheet">
 </head>
+<style>
+    .bg{
+    
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('img/products/bgPD.jpeg');
+    background-size: cover;
+    background-position: center;
+    padding: 20px;
+    padding-top: 20%;
+}
+</style>
 <body>
-
+<nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-lg">
+            <a class="navbar-brand" href="#">
+                Board Mart Event Place
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="mx-auto">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="swimming_packages.php">Packages</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contactmain.php">Contact</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="profilecopy.php">Profile</a>
+                        </li>
+                        <?php
+                      
+                        if (!isset($_SESSION['user_id'])):
+                        ?>
+                         
+                            <li class="nav-item login">
+                                <a class="nav-link" href="login.php">Login</a>
+                            </li>
+                        <?php else: ?>
+                            
+                            <li class="nav-item logout">
+                                <form action="logout.php" method="POST">
+                                    <button type="submit" class="nav-link btn btn-link" onclick="return confirmLogout()">Logout</button>
+                                </form>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
 <section class="bg" id="hero">
     <div class="container-lg" style="margin-bottom: 20%;">
         <div class="row align-items-center">

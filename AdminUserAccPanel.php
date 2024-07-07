@@ -12,7 +12,7 @@ if ($conn->connect_error) {
 
 $message = "";
 
-// Create operation
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create"])) {
     $username = $_POST["username"];
     $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
@@ -23,12 +23,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create"])) {
     $contact_number = $_POST["contact_number"];
     $address = $_POST["address"];
 
-    // Calculate age from date of birth
+    
     $dob = new DateTime($date_of_birth);
     $now = new DateTime();
     $age = $now->diff($dob)->y;
 
-    // Check if username already exists
+  
     $check_username_sql = "SELECT * FROM users WHERE username = '$username'";
     $result = $conn->query($check_username_sql);
 
@@ -46,7 +46,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create"])) {
     }
 }
 
-// Update operation
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
     $id = $_POST["id"];
     $username = $_POST["username"];
@@ -57,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
     $contact_number = $_POST["contact_number"];
     $address = $_POST["address"];
 
-    // Calculate age from date of birth
+
     $dob = new DateTime($date_of_birth);
     $now = new DateTime();
     $age = $now->diff($dob)->y;
@@ -71,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
     }
 }
 
-// Delete operation
+
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $sql = "DELETE FROM users WHERE id=$id";
@@ -82,13 +81,12 @@ if (isset($_GET['delete'])) {
     }
 }
 
-// Fetch users
 $users = $conn->query("SELECT * FROM users");
 
 $conn->close();
 ?>
 
-<!DOCTYPE html>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

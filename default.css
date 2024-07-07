@@ -1,0 +1,98 @@
+
+
+html{
+    scroll-behavior: smooth;
+}
+section[class^="container"]{
+    padding: 4rem 2rem;
+}
+
+
+p{
+    text-align: justify;
+}
+body{
+    font-family:'Times New Roman', Times, serif;
+    background-color: #ffffff;
+  
+}   
+.container {
+  
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+img{
+    border-radius: 10px;
+
+}
+.notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #28a745;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    display: none;
+}
+
+
+
+/* NavBar to Repa */
+
+.navbar {
+    background-color: whitesmoke; 
+}
+
+.navbar-nav .nav-link {
+    color: black;
+    font-size: 1.1rem; 
+}
+
+.navbar-nav .nav-item {
+    padding: 0 1rem;
+}
+
+.navbar .navbar-nav .nav-item{
+    position: relative;
+}
+
+.navbar .navbar-nav .nav-item::after{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    content: '';
+    background-color: black;
+    width: 0%;
+    height: 4px;
+    transition: 500ms;
+}
+
+.navbar .navbar-nav .nav-item:hover:after{
+    width: 100%;
+}
+.nav-item.login {
+    margin-left: auto; 
+}
+
+.nav-item.login a {
+    color: #007bff;
+}
+
+.nav-item.logout button {
+    color: #dc3545; 
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.nav-item.logout button:hover {
+    color: #fff;
+    background-color: #dc3545;
+}
+

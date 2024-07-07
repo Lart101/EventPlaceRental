@@ -4,10 +4,10 @@ $username = "root";
 $password = "";
 $dbname = "event_store";
 
-// Create connection
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -15,10 +15,9 @@ if ($conn->connect_error) {
 $message = "";
 $error = false;
 
-// Initialize variables to hold form data
 $username = $password = $first_name = $middle_name = $last_name = $email = $date_of_birth = $gender = $contact_number = $barangay = $city = $blk = "";
 
-// Handle form submission
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST["username"];
     $password = $_POST["password"];
@@ -34,17 +33,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $city = $_POST["city"];
     $blk = $_POST["blk"];
 
-    // Calculate age from date of birth
     $dob = new DateTime($date_of_birth);
     $now = new DateTime();
     $age = $now->diff($dob)->y;
 
-    // Validate age
+    
     if ($age < 18) {
         $message = "You must be at least 18 years old to register.";
         $error = true;
     } else {
-        // Check if username already exists
+    
         $check_username_stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
         $check_username_stmt->bind_param("s", $username);
         $check_username_stmt->execute();
@@ -55,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = true;
         }
 
-        // Check if email already exists
+        
         $check_email_stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
         $check_email_stmt->bind_param("s", $email);
         $check_email_stmt->execute();
@@ -66,7 +64,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = true;
         }
 
-        // If no errors, proceed with registration
         if (!$error) {
 
             // Concatenate address parts into a single variable
@@ -142,6 +139,7 @@ $conn->close();
 </head>
 
 <body>
+
     <div class="container">
         <div class="form-left">
             <div class="title">Registration</div>

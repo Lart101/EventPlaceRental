@@ -1,3 +1,100 @@
+<?php
+session_start();
+
+
+$conn = new mysqli("localhost", "root", "", "event_store");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
+}
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $packageId = htmlspecialchars(mysqli_real_escape_string($conn, $_POST['package_id']));
+    $start_date = htmlspecialchars(mysqli_real_escape_string($conn, $_POST['start_date']));
+    $end_date = htmlspecialchars(mysqli_real_escape_string($conn, $_POST['end_date']));
+
+   
+    $overlap = false;
+    $reservedSql = "SELECT * FROM package_reservations WHERE package_id = ? AND ((start_date <= ? AND end_date >= ?) OR (start_date <= ? AND end_date >= ?) OR (start_date >= ? AND end_date <= ?))";
+    $stmt = $conn->prepare($reservedSql);
+    $stmt->bind_param("ississs", $packageId, $start_date, $start_date, $end_date, $end_date, $start_date, $end_date);
+
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows > 0) {
+        $overlap = true;
+    }
+    $stmt->close();
+
+    if ($overlap) {
+        $_SESSION['reservation_error'] = "Selected date range overlaps with existing reservations. Please choose another date range.";
+        header("Location: package_details.php?id=$packageId");
+        exit();
+    }
+
+    
+    $sql = "SELECT price FROM swimming_packages WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $packageId);
+    $stmt->execute();
+    $stmt->bind_result($price);
+    $stmt->fetch();
+    $stmt->close();
+
+    $totalPrice = ($price * (strtotime($end_date) - strtotime($start_date)) / (60 * 60 * 24)) + $price * 0.05;
+
+    
+
+
+
+    $insertSql = "INSERT INTO package_reservations (package_id, user_id, start_date, end_date, total_price) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($insertSql);
+    $stmt->bind_param("iisss", $packageId, $_SESSION['user_id'], $start_date, $end_date, $totalPrice);
+    $result = $stmt->execute();
+    $stmt->close();
+
+
+    $_SESSION['reservation_success'] = $result;
+
+ 
+    header("Location: package_details.php?id=$packageId");
+    exit();
+}
+
+
+$packageId = htmlspecialchars(mysqli_real_escape_string($conn, $_GET['id']));
+$sql = "SELECT package_name, inclusions, price, duration, max_pax, multiple_images FROM swimming_packages WHERE id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $packageId);
+$stmt->execute();
+$stmt->bind_result($package_name, $inclusions, $price, $duration, $max_pax, $multiple_images);
+$stmt->fetch();
+$stmt->close();
+
+
+$packageImages = explode(",", $multiple_images);
+
+$reservedDates = [];
+$reservedSql = "SELECT start_date, end_date FROM package_reservations WHERE package_id = ?";
+$stmt = $conn->prepare($reservedSql);
+$stmt->bind_param("i", $packageId);
+$stmt->execute();
+$stmt->bind_result($start_date, $end_date);
+while ($stmt->fetch()) {
+    $reservedDates[] = ['start_date' => $start_date, 'end_date' => $end_date];
+}
+$stmt->close();
+
+$conn->close();
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,6 +103,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swimming Package Details</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
+    <link href="default.css" rel="stylesheet">
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
     <style>
         .reserved-dates {
             margin-top: 20px;
@@ -31,9 +135,10 @@
         }
 
         .image-collage img {
-            width: calc(50% - 5px); /* Adjust based on desired collage layout */
+            width: calc(50% - 5px); 
             height: auto;
             cursor: pointer;
+
         }
 
         .image-viewer {
@@ -48,6 +153,7 @@
             padding: 20px;
             box-sizing: border-box;
             overflow-y: auto;
+            
         }
 
         .image-viewer img {
@@ -55,6 +161,7 @@
             max-height: 80vh;
             display: block;
             margin: 0 auto;
+            margin-top: 10px;
         }
 
         .close-btn {
@@ -69,112 +176,51 @@
 </head>
 
 <body>
+<nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-lg">
+            <a class="navbar-brand" href="#">
+                Board Mart Event Place
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="mx-auto">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="swimming_packages.php">Packages</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contactmain.php">Contact</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="profilecopy.php">Profile</a>
+                        </li>
+                        <?php
+                      
+                        if (!isset($_SESSION['user_id'])):
+                        ?>
+                         
+                            <li class="nav-item login">
+                                <a class="nav-link" href="login.php">Login</a>
+                            </li>
+                        <?php else: ?>
+                            
+                            <li class="nav-item logout">
+                                <form action="logout.php" method="POST">
+                                    <button type="submit" class="nav-link btn btn-link" onclick="return confirmLogout()">Logout</button>
+                                </form>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-<?php
-session_start();
 
-// Database connection
-$conn = new mysqli("localhost", "root", "", "event_store");
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
-// Validate session
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit();
-}
-
-// Check if reservation was successful and display alert
-if (isset($_SESSION['reservation_success']) && $_SESSION['reservation_success']) {
-    echo '<script>alert("Reservation successful!");</script>';
-    unset($_SESSION['reservation_success']); // Unset session variable
-}
-
-// Handle form submission for reservation
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $packageId = htmlspecialchars(mysqli_real_escape_string($conn, $_POST['package_id']));
-    $start_date = htmlspecialchars(mysqli_real_escape_string($conn, $_POST['start_date']));
-    $end_date = htmlspecialchars(mysqli_real_escape_string($conn, $_POST['end_date']));
-
-    // Calculate total price and reservation fee (assuming 5%)
-    $sql = "SELECT price FROM swimming_packages WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $packageId);
-    $stmt->execute();
-    $stmt->bind_result($price);
-    $stmt->fetch();
-    $stmt->close();
-
-    // Calculate total price based on duration
-    $totalPrice = ($price * (strtotime($end_date) - strtotime($start_date)) / (60 * 60 * 24)) + $price * 0.05;
-
-    // Check for add-ons and calculate additional costs
-    $add_ons_total = 0;
-    if (isset($_POST['add_ons'])) {
-        $add_ons = $_POST['add_ons'];
-        foreach ($add_ons as $addon) {
-            switch ($addon) {
-                case 'family_room':
-                    $add_ons_total += 3000;
-                    break;
-                case 'suite_room':
-                    $add_ons_total += 5000;
-                    break;
-                case 'videoke_game_room':
-                    $add_ons_total += 3000;
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    // Update total price with add-ons
-    $totalPrice += $add_ons_total;
-
-    // Insert reservation into database
-    $insertSql = "INSERT INTO package_reservations (package_id, user_id, start_date, end_date, total_price) VALUES (?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($insertSql);
-    $stmt->bind_param("iisss", $packageId, $_SESSION['user_id'], $start_date, $end_date, $totalPrice);
-    $result = $stmt->execute();
-    $stmt->close();
-
-    // Set reservation success session variable
-    $_SESSION['reservation_success'] = $result;
-
-    // Redirect back to this page to prevent form resubmission on refresh
-    header("Location: package_details.php?id=$packageId");
-    exit();
-}
-
-// Fetch package details
-$packageId = htmlspecialchars(mysqli_real_escape_string($conn, $_GET['id']));
-$sql = "SELECT package_name, inclusions, price, duration, max_pax, multiple_images FROM swimming_packages WHERE id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $packageId);
-$stmt->execute();
-$stmt->bind_result($package_name, $inclusions, $price, $duration, $max_pax, $multiple_images);
-$stmt->fetch();
-$stmt->close();
-
-// Split multiple_images column into an array of image URLs
-$packageImages = explode(",", $multiple_images);
-
-// Fetch already reserved dates for this package
-$reservedDates = [];
-$reservedSql = "SELECT start_date, end_date FROM package_reservations WHERE package_id = ?";
-$stmt = $conn->prepare($reservedSql);
-$stmt->bind_param("i", $packageId);
-$stmt->execute();
-$stmt->bind_result($start_date, $end_date);
-while ($stmt->fetch()) {
-    $reservedDates[] = ['start_date' => $start_date, 'end_date' => $end_date];
-}
-$stmt->close();
-
-$conn->close();
-?>
 
 <nav aria-label="breadcrumb" style="padding-top: 5%; margin-left: 20px;">
     <ol class="breadcrumb fade-in">
@@ -186,25 +232,19 @@ $conn->close();
 <div class="container mt-5 pt-5 fade-in">
     <div class="row">
         <div class="col-md-6">
-            <div class="image-collage" id="imageCollage">
+        <div class="image-collage" id="imageCollage">
                 <?php
                 $counter = 0;
-                foreach ($packageImages as $image) {
+                foreach ($packageImages as $index => $image) {
                     if ($counter < 4) {
-                        echo '<img src="' . $image . '" class="img-fluid" alt="' . $package_name . '">';
+                        echo '<img src="' . $image . '" class="img-fluid" alt="' . $package_name . '" onclick="openImageViewer(' . $index . ')">';
                     } else {
-                        echo '<span id="showMoreBtn" class="btn btn-link text-decoration-none">Show More</span>';
+                        echo '<span id="showMoreBtn" class="btn btn-link text-decoration-none" onclick="showAllImages()">Show More</span>';
                         break;
                     }
                     $counter++;
                 }
                 ?>
-            </div>
-            <div class="image-viewer" id="imageViewer">
-                <?php foreach ($packageImages as $index => $image): ?>
-                    <img src="<?php echo $image; ?>" class="img-fluid" alt="<?php echo $package_name; ?>" <?php if ($index >= 4) echo 'style="display:none;"'; ?>>
-                <?php endforeach; ?>
-                <span class="close-btn" onclick="closeImageViewer()">&times;</span>
             </div>
         </div>
         <div class="col-md-6">
@@ -225,29 +265,21 @@ $conn->close();
                     <input type="date" id="end_date" name="end_date" class="form-control" disabled required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Add-ons:</label><br>
-                    <input type="checkbox" id="family_room" name="add_ons[]" value="family_room" onchange="calculatePrices()">
-                    <label for="family_room">Family Room (12 pax | 8hrs) - Php3000</label><br>
-                    <input type="checkbox" id="suite_room" name="add_ons[]" value="suite_room" onchange="calculatePrices()">
-                    <label for="suite_room">Suite Room (4 pax | 8hrs) - Php5000</label><br>
-                    <input type="checkbox" id="videoke_game_room" name="add_ons[]" value="videoke_game_room" onchange="calculatePrices()">
-                    <label for="videoke_game_room">Videoke and Game Room (2 pax | 8hrs) - Php3000</label><br>
-                </div>
-                <div class="mb-3">
                     <label for="total_price" class="form-label">Total Price:</label>
                     <input type="text" id="total_price" class="form-control" readonly>
                 </div>
                 <div class="mb-3">
-                    <label for="reservation_fee" class="form-label">Reservation Fee (5%):</label>
-                    <input type="text" id="reservation_fee" class="form-control" readonly>
-                </div>
+    <label for="reservation_fee" class="form-label">Reservation Fee (5%):</label>
+    <span class="text-danger">You can only use the reservation within 5 hours</span>
+    <input type="text" id="reservation_fee" class="form-control" readonly>
+</div>
+
                 <button type="submit" class="btn btn-primary">Reserve Now</button>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Reserved Dates Section -->
 <div class="container mt-5 reserved-dates">
     <h2>Already Reserved Dates</h2>
     <ul>
@@ -262,6 +294,13 @@ $conn->close();
         ?>
     </ul>
 </div>
+<!-- Image Viewer -->
+<div class="image-viewer" id="imageViewer">
+    <?php foreach ($packageImages as $index => $image): ?>
+        <img src="<?php echo $image; ?>" class="img-fluid <?php if ($index >= 4) echo 'hidden-image'; ?>" alt="<?php echo $package_name; ?>">
+    <?php endforeach; ?>
+    <span class="close-btn" onclick="closeImageViewer()">&times;</span>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script>
@@ -274,29 +313,10 @@ $conn->close();
             const days = (endDate - startDate) / (1000 * 60 * 60 * 24) + 1;
             let totalPrice = days * basePrice;
 
-            // Calculate add-ons price
-            const addOns = document.querySelectorAll('input[name="add_ons[]"]:checked');
-            let addOnsTotal = 0;
-            addOns.forEach(function(addOn) {
-                switch (addOn.value) {
-                    case 'family_room':
-                        addOnsTotal += 3000;
-                        break;
-                    case 'suite_room':
-                        addOnsTotal += 5000;
-                        break;
-                    case 'videoke_game_room':
-                        addOnsTotal += 3000;
-                        break;
-                    default:
-                        break;
-                }
-            });
+            
 
-            // Update total price
-            totalPrice += addOnsTotal;
+           
 
-            // Calculate reservation fee (5%)
             const reservationFee = totalPrice * 0.05;
 
             // Display calculated prices
@@ -345,26 +365,42 @@ $conn->close();
     }
 
     function validateReservation() {
-        if (document.getElementById('end_date').disabled) {
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+
+        if (endDateInput.disabled) {
             alert('Please select valid dates.');
             return false;
         }
 
-        // Proceed with form submission
-        calculatePrices();
+        // Check for overlapping dates
+        disableReservedDates();
+
+        // If no overlap, proceed with form submission
         return true;
     }
-
+</script>
+<script>
     document.getElementById('showMoreBtn').addEventListener('click', function() {
-        const imageViewer = document.getElementById('imageViewer');
-        imageViewer.style.display = 'block';
+        const hiddenImages = document.querySelectorAll('.hidden-image');
+        hiddenImages.forEach(function(image) {
+            image.classList.remove('hidden-image');
+        });
+        document.getElementById('imageViewer').style.display = 'block';
     });
 
     function closeImageViewer() {
         const imageViewer = document.getElementById('imageViewer');
         imageViewer.style.display = 'none';
+
+        // Hide all images again when closing viewer
+        const hiddenImages = document.querySelectorAll('.hidden-image');
+        hiddenImages.forEach(function(image) {
+            image.classList.add('hidden-image');
+        });
     }
 </script>
+
 
 </body>
 

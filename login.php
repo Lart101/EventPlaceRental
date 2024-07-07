@@ -2,7 +2,7 @@
 session_start();
 
 if (isset($_SESSION['user_id'])) {
-    header('Location: event.php');
+    header('Location: swimming_packages.php');
     exit();
 }
 
@@ -28,16 +28,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->fetch();
 
   
-        if ($userId) {
-            echo "User ID: $userId<br>";
-            echo "Stored Password: $storedPassword<br>";
-        } else {
-            echo "No user found with username: $username<br>";
-        }
-
         if ($password === $storedPassword) {
             $_SESSION['user_id'] = $userId;
-            header('Location: event.php');
+            header('Location: swimming_packages.php');
             exit();
         } else {
             $error = "Invalid username or password.";
@@ -78,9 +71,11 @@ $conn->close();
             background-color: #f44336;
         }
     </style>
+    
 </head>
 
 <body>
+
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-6 offset-md-3">
@@ -101,6 +96,9 @@ $conn->close();
             </form>
             <div class="register-link">
                 <p>Don't have an account? <a href="register.php">register</a></p>
+            </div>
+            <div class="forgot-password-link">
+                <p>Forgot your password? <a href="forgot_password.php">Reset Password</a></p>
             </div>
         </div>
     </div>
