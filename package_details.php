@@ -33,6 +33,37 @@
         .image-collage img {
             width: calc(50% - 5px); /* Adjust based on desired collage layout */
             height: auto;
+            cursor: pointer;
+        }
+
+        .image-viewer {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .image-viewer img {
+            max-width: 100%;
+            max-height: 80vh;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -155,10 +186,25 @@ $conn->close();
 <div class="container mt-5 pt-5 fade-in">
     <div class="row">
         <div class="col-md-6">
-            <div class="image-collage">
-                <?php foreach ($packageImages as $image): ?>
-                    <img src="<?php echo $image; ?>" class="img-fluid" alt="<?php echo $package_name; ?>">
+            <div class="image-collage" id="imageCollage">
+                <?php
+                $counter = 0;
+                foreach ($packageImages as $image) {
+                    if ($counter < 4) {
+                        echo '<img src="' . $image . '" class="img-fluid" alt="' . $package_name . '">';
+                    } else {
+                        echo '<span id="showMoreBtn" class="btn btn-link text-decoration-none">Show More</span>';
+                        break;
+                    }
+                    $counter++;
+                }
+                ?>
+            </div>
+            <div class="image-viewer" id="imageViewer">
+                <?php foreach ($packageImages as $index => $image): ?>
+                    <img src="<?php echo $image; ?>" class="img-fluid" alt="<?php echo $package_name; ?>" <?php if ($index >= 4) echo 'style="display:none;"'; ?>>
                 <?php endforeach; ?>
+                <span class="close-btn" onclick="closeImageViewer()">&times;</span>
             </div>
         </div>
         <div class="col-md-6">
@@ -186,7 +232,6 @@ $conn->close();
                     <label for="suite_room">Suite Room (4 pax | 8hrs) - Php5000</label><br>
                     <input type="checkbox" id="videoke_game_room" name="add_ons[]" value="videoke_game_room" onchange="calculatePrices()">
                     <label for="videoke_game_room">Videoke and Game Room (2 pax | 8hrs) - Php3000</label><br>
-                    
                 </div>
                 <div class="mb-3">
                     <label for="total_price" class="form-label">Total Price:</label>
@@ -196,11 +241,11 @@ $conn->close();
                     <label for="reservation_fee" class="form-label">Reservation Fee (5%):</label>
                     <input type="text" id="reservation_fee" class="form-control" readonly>
                 </div>
-             
                 <button type="submit" class="btn btn-primary">Reserve Now</button>
             </form>
         </div>
-        </div>
+    </div>
+</div>
 
 <!-- Reserved Dates Section -->
 <div class="container mt-5 reserved-dates">
@@ -309,9 +354,18 @@ $conn->close();
         calculatePrices();
         return true;
     }
+
+    document.getElementById('showMoreBtn').addEventListener('click', function() {
+        const imageViewer = document.getElementById('imageViewer');
+        imageViewer.style.display = 'block';
+    });
+
+    function closeImageViewer() {
+        const imageViewer = document.getElementById('imageViewer');
+        imageViewer.style.display = 'none';
+    }
 </script>
 
 </body>
 
 </html>
-

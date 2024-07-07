@@ -129,8 +129,60 @@ $conn->close();
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="style2.css">
 </head>
+<style>
+        .collage {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .collage img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .collage img:hover {
+            transform: scale(1.1);
+        }
+        .image-viewer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 999;
+            text-align: center;
+            overflow-y: auto;
+        }
+        .image-viewer img {
+            max-width: 90%;
+            max-height: 90%;
+            margin: 20px auto;
+            display: block;
+        }
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
 <body>
-    <div class="container">
+    <div class="container" style="max-width: 1200px;
+    width: 100%; 
+    margin: 10 auto; 
+ 
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
         <div class="form-left">
             <div class="title">Admin Panel - Swimming Packages</div>
         
@@ -150,47 +202,77 @@ $conn->close();
                 </div>
 
                 <table class="table" id="packageTable">
-    <thead>
+                <thead>
+    <tr>
+        <th>ID</th>
+        <th>Package Name</th>
+        <th>Price</th>
+        <th>Duration</th>
+        <th>Max Pax</th>
+        <th>Inclusions</th>
+        <th>Profile Image</th>
+        <th>Multiple Images</th>
+        <th>Actions</th>
+    </tr>
+</thead>
+<tbody>
+    <?php while ($package = $swimming_packages->fetch_assoc()) { ?>
         <tr>
-            <th>ID</th>
-            <th>Package Name</th>
-            <th>Price</th>
-            <th>Duration</th>
-            <th>Max Pax</th>
-            <th>Inclusions</th>
-            <th>Profile Image</th>
-            <th>Multiple Images</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php while ($package = $swimming_packages->fetch_assoc()) { ?>
-            <tr>
-                <td><?php echo $package['id']; ?></td>
-                <td><?php echo $package['package_name']; ?></td>
-                <td><?php echo $package['price']; ?></td>
-                <td><?php echo $package['duration']; ?></td>
-                <td><?php echo $package['max_pax']; ?></td>
-                <td><?php echo $package['inclusions']; ?></td>
-                <td><img src="<?php echo $package['profile_image']; ?>" alt="Profile Image" style="width: 100px; height: 100px;"></td>
-                <td>
+            <td><?php echo $package['id']; ?></td>
+            <td><?php echo $package['package_name']; ?></td>
+            <td><?php echo $package['price']; ?></td>
+            <td><?php echo $package['duration']; ?></td>
+            <td><?php echo $package['max_pax']; ?></td>
+            <td><?php echo $package['inclusions']; ?></td>
+            <td>
+                <img src="<?php echo $package['profile_image']; ?>" alt="Profile Image" style="width: 100px; height: 100px; cursor: pointer;" onclick="openImageViewer('<?php echo $package['multiple_images']; ?>')">
+            </td>
+            <td>
+                <div class="collage">
                     <?php
                     $images = explode(',', $package['multiple_images']);
-                    foreach ($images as $image) {
-                        echo "<img src='$image' alt='Multiple Image' style='width: 100px; height: 100px; margin-right: 5px;'>";
+                    $total_images = count($images);
+                    $max_display = 2;
+
+                    foreach (array_slice($images, 0, min($max_display, $total_images)) as $image) {
+                        echo "<img src='$image' alt='Multiple Image' style='width: 100px; height: 100px; margin-right: 5px; cursor: pointer;' onclick='openImageViewer(\"{$package['multiple_images']}\")'>";
+                    }
+
+                    if ($total_images > $max_display) {
+                        echo "<button class='btn btn-link p-0' onclick='openImageViewer(\"{$package['multiple_images']}\")'>Show More</button>";
                     }
                     ?>
-                </td>
-                <td>
-                    <button class="btn btn-primary btn-sm edit-package-btn" data-toggle="modal" data-target="#editPackageModal" data-id="<?php echo $package['id']; ?>" data-package_name="<?php echo $package['package_name']; ?>" data-price="<?php echo $package['price']; ?>" data-duration="<?php echo $package['duration']; ?>" data-max_pax="<?php echo $package['max_pax']; ?>" data-inclusions="<?php echo $package['inclusions']; ?>">Edit</button>
-                    <a href="?delete=<?php echo $package['id']; ?>" class="btn btn-danger btn-sm">Delete</a>
-                </td>
-            </tr>
-        <?php } ?>
-    </tbody>
-</table>
+                </div>
+            </td>
+            <td>
+                <button class="btn btn-primary btn-sm edit-package-btn" data-toggle="modal" data-target="#editPackageModal" data-id="<?php echo $package['id']; ?>" data-package_name="<?php echo $package['package_name']; ?>" data-price="<?php echo $package['price']; ?>" data-duration="<?php echo $package['duration']; ?>" data-max_pax="<?php echo $package['max_pax']; ?>" data-inclusions="<?php echo $package['inclusions']; ?>">Edit</button>
+                <a href="?delete=<?php echo $package['id']; ?>" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+        </tr>
+    <?php } ?>
+</tbody>
+
 
             </div>
+<!-- Image Viewer Modal -->
+<div class="modal fade" id="imageViewerModal" tabindex="-1" role="dialog" aria-labelledby="imageViewerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageViewerModalLabel">Image Viewer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="imageViewerBody">
+                <!-- Images will be dynamically added here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
             <!-- Create Package Modal -->
             <div class="modal fade" id="createPackageModal" tabindex="-1" role="dialog" aria-labelledby="createPackageModalLabel" aria-hidden="true">
@@ -305,5 +387,24 @@ $conn->close();
             $("#edit_inclusions").val(inclusions);
         });
     </script>
+    <script>
+    function openImageViewer(multipleImages) {
+        var images = multipleImages.split(',');
+        var modalBody = document.getElementById('imageViewerBody');
+        modalBody.innerHTML = '';
+
+        images.forEach(function(image) {
+            var img = document.createElement('img');
+            img.src = image.trim();
+            img.alt = 'Multiple Image';
+            img.style.width = '100%'; // Adjust width as needed
+            img.style.height = 'auto'; // Maintain aspect ratio
+            modalBody.appendChild(img);
+        });
+
+        $('#imageViewerModal').modal('show'); // Show Bootstrap modal
+    }
+</script>
+
 </body>
 </html>
