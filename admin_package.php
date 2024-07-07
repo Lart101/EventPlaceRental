@@ -12,7 +12,8 @@ if ($conn->connect_error) {
 
 $message = "";
 
-function uploadImage($file, $is_multiple = false) {
+function uploadImage($file, $is_multiple = false)
+{
     $target_dir = "uploads/";
     if (!file_exists($target_dir)) {
         mkdir($target_dir, 0777, true);
@@ -122,6 +123,7 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -130,50 +132,56 @@ $conn->close();
     <link rel="stylesheet" href="style2.css">
 </head>
 <style>
-        .collage {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-        .collage img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .collage img:hover {
-            transform: scale(1.1);
-        }
-        .image-viewer {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 999;
-            text-align: center;
-            overflow-y: auto;
-        }
-        .image-viewer img {
-            max-width: 90%;
-            max-height: 90%;
-            margin: 20px auto;
-            display: block;
-        }
-        .close {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: #fff;
-            font-size: 30px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-    </style>
+    .collage {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .collage img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .collage img:hover {
+        transform: scale(1.1);
+    }
+
+    .image-viewer {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        z-index: 999;
+        text-align: center;
+        overflow-y: auto;
+    }
+
+    .image-viewer img {
+        max-width: 90%;
+        max-height: 90%;
+        margin: 20px auto;
+        display: block;
+    }
+
+    .close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        color: #fff;
+        font-size: 30px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+
 <body>
     <div class="container" style="max-width: 1200px;
     width: 100%; 
@@ -185,7 +193,7 @@ $conn->close();
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
         <div class="form-left">
             <div class="title">Admin Panel - Swimming Packages</div>
-        
+
             <?php if ($message != "") { ?>
                 <div class='message'><?php echo $message; ?></div>
             <?php } ?>
@@ -193,89 +201,101 @@ $conn->close();
             <div class="package-list">
                 <div class="search-create-container row mb-3">
                     <div class="search-container col-md-8 d-flex">
-                        <input type="text" id="searchInput" class="form-control mr-2" placeholder="Search for packages...">
+                        <input type="text" id="searchInput" class="form-control mr-2"
+                            placeholder="Search for packages...">
                         <button type="button" id="searchButton" class="btn btn-primary btn-custom-large">Search</button>
                     </div>
                     <div class="col-md-4 d-flex justify-content-end">
-                        <button type="button" class="btn btn-success btn-custom-large" data-toggle="modal" data-target="#createPackageModal">Create Package</button>
+                        <button type="button" class="btn btn-success btn-custom-large" data-toggle="modal"
+                            data-target="#createPackageModal">Create Package</button>
                     </div>
                 </div>
 
                 <table class="table" id="packageTable">
-                <thead>
-    <tr>
-        <th>ID</th>
-        <th>Package Name</th>
-        <th>Price</th>
-        <th>Duration</th>
-        <th>Max Pax</th>
-        <th>Inclusions</th>
-        <th>Profile Image</th>
-        <th>Multiple Images</th>
-        <th>Actions</th>
-    </tr>
-</thead>
-<tbody>
-    <?php while ($package = $swimming_packages->fetch_assoc()) { ?>
-        <tr>
-            <td><?php echo $package['id']; ?></td>
-            <td><?php echo $package['package_name']; ?></td>
-            <td><?php echo $package['price']; ?></td>
-            <td><?php echo $package['duration']; ?></td>
-            <td><?php echo $package['max_pax']; ?></td>
-            <td><?php echo $package['inclusions']; ?></td>
-            <td>
-                <img src="<?php echo $package['profile_image']; ?>" alt="Profile Image" style="width: 100px; height: 100px; cursor: pointer;" onclick="openImageViewer('<?php echo $package['multiple_images']; ?>')">
-            </td>
-            <td>
-                <div class="collage">
-                    <?php
-                    $images = explode(',', $package['multiple_images']);
-                    $total_images = count($images);
-                    $max_display = 2;
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Package Name</th>
+                            <th>Price</th>
+                            <th>Duration</th>
+                            <th>Max Pax</th>
+                            <th>Inclusions</th>
+                            <th>Profile Image</th>
+                            <th>Multiple Images</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($package = $swimming_packages->fetch_assoc()) { ?>
+                            <tr>
+                                <td><?php echo $package['id']; ?></td>
+                                <td><?php echo $package['package_name']; ?></td>
+                                <td><?php echo $package['price']; ?></td>
+                                <td><?php echo $package['duration']; ?></td>
+                                <td><?php echo $package['max_pax']; ?></td>
+                                <td><?php echo $package['inclusions']; ?></td>
+                                <td>
+                                    <img src="<?php echo $package['profile_image']; ?>" alt="Profile Image"
+                                        style="width: 100px; height: 100px; cursor: pointer;"
+                                        onclick="openImageViewer('<?php echo $package['multiple_images']; ?>')">
+                                </td>
+                                <td>
+                                    <div class="collage">
+                                        <?php
+                                        $images = explode(',', $package['multiple_images']);
+                                        $total_images = count($images);
+                                        $max_display = 2;
 
-                    foreach (array_slice($images, 0, min($max_display, $total_images)) as $image) {
-                        echo "<img src='$image' alt='Multiple Image' style='width: 100px; height: 100px; margin-right: 5px; cursor: pointer;' onclick='openImageViewer(\"{$package['multiple_images']}\")'>";
-                    }
+                                        foreach (array_slice($images, 0, min($max_display, $total_images)) as $image) {
+                                            echo "<img src='$image' alt='Multiple Image' style='width: 100px; height: 100px; margin-right: 5px; cursor: pointer;' onclick='openImageViewer(\"{$package['multiple_images']}\")'>";
+                                        }
 
-                    if ($total_images > $max_display) {
-                        echo "<button class='btn btn-link p-0' onclick='openImageViewer(\"{$package['multiple_images']}\")'>Show More</button>";
-                    }
-                    ?>
+                                        if ($total_images > $max_display) {
+                                            echo "<button class='btn btn-link p-0' onclick='openImageViewer(\"{$package['multiple_images']}\")'>Show More</button>";
+                                        }
+                                        ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm edit-package-btn" data-toggle="modal"
+                                        data-target="#editPackageModal" data-id="<?php echo $package['id']; ?>"
+                                        data-package_name="<?php echo $package['package_name']; ?>"
+                                        data-price="<?php echo $package['price']; ?>"
+                                        data-duration="<?php echo $package['duration']; ?>"
+                                        data-max_pax="<?php echo $package['max_pax']; ?>"
+                                        data-inclusions="<?php echo $package['inclusions']; ?>">Edit</button>
+                                    <a href="?delete=<?php echo $package['id']; ?>" class="btn btn-danger btn-sm">Delete</a>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+
+
+            </div>
+            <!-- Image Viewer Modal -->
+            <div class="modal fade" id="imageViewerModal" tabindex="-1" role="dialog"
+                aria-labelledby="imageViewerModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="imageViewerModalLabel">Image Viewer</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" id="imageViewerBody">
+                            <!-- Images will be dynamically added here -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
                 </div>
-            </td>
-            <td>
-                <button class="btn btn-primary btn-sm edit-package-btn" data-toggle="modal" data-target="#editPackageModal" data-id="<?php echo $package['id']; ?>" data-package_name="<?php echo $package['package_name']; ?>" data-price="<?php echo $package['price']; ?>" data-duration="<?php echo $package['duration']; ?>" data-max_pax="<?php echo $package['max_pax']; ?>" data-inclusions="<?php echo $package['inclusions']; ?>">Edit</button>
-                <a href="?delete=<?php echo $package['id']; ?>" class="btn btn-danger btn-sm">Delete</a>
-            </td>
-        </tr>
-    <?php } ?>
-</tbody>
-
-
             </div>
-<!-- Image Viewer Modal -->
-<div class="modal fade" id="imageViewerModal" tabindex="-1" role="dialog" aria-labelledby="imageViewerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="imageViewerModalLabel">Image Viewer</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="imageViewerBody">
-                <!-- Images will be dynamically added here -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
 
             <!-- Create Package Modal -->
-            <div class="modal fade" id="createPackageModal" tabindex="-1" role="dialog" aria-labelledby="createPackageModalLabel" aria-hidden="true">
+            <div class="modal fade" id="createPackageModal" tabindex="-1" role="dialog"
+                aria-labelledby="createPackageModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -287,7 +307,7 @@ $conn->close();
                         <div class="modal-body">
                             <form id="createPackageForm" method="post" action="" enctype="multipart/form-data">
                                 <input type="hidden" name="create" value="1">
-                                
+
                                 <label for="package_name">Package Name:</label>
                                 <input type="text" id="package_name" name="package_name" class="form-control" required>
 
@@ -299,13 +319,13 @@ $conn->close();
 
                                 <label for="price">Price:</label>
                                 <input type="number" id="price" name="price" class="form-control" required>
-                                
+
                                 <label for="duration">Duration:</label>
                                 <input type="text" id="duration" name="duration" class="form-control" required>
-                                
+
                                 <label for="max_pax">Max Pax:</label>
                                 <input type="number" id="max_pax" name="max_pax" class="form-control" required>
-                                
+
                                 <label for="inclusions">Inclusions:</label>
                                 <textarea id="inclusions" name="inclusions" class="form-control" required></textarea>
 
@@ -320,7 +340,8 @@ $conn->close();
             </div>
 
             <!-- Edit Package Modal -->
-            <div class="modal fade" id="editPackageModal" tabindex="-1" role="dialog" aria-labelledby="editPackageModalLabel" aria-hidden="true">
+            <div class="modal fade" id="editPackageModal" tabindex="-1" role="dialog"
+                aria-labelledby="editPackageModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -335,7 +356,8 @@ $conn->close();
                                 <input type="hidden" id="edit_package_id" name="id">
 
                                 <label for="edit_package_name">Package Name:</label>
-                                <input type="text" id="edit_package_name" name="package_name" class="form-control" required>
+                                <input type="text" id="edit_package_name" name="package_name" class="form-control"
+                                    required>
 
                                 <label for="edit_profile_image">Profile Image:</label>
                                 <input type="file" id="edit_profile_image" name="profile_image">
@@ -353,7 +375,8 @@ $conn->close();
                                 <input type="number" id="edit_max_pax" name="max_pax" class="form-control" required>
 
                                 <label for="edit_inclusions">Inclusions:</label>
-                                <textarea id="edit_inclusions" name="inclusions" class="form-control" required></textarea>
+                                <textarea id="edit_inclusions" name="inclusions" class="form-control"
+                                    required></textarea>
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -371,7 +394,7 @@ $conn->close();
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        $(document).on("click", ".edit-package-btn", function() {
+        $(document).on("click", ".edit-package-btn", function () {
             var id = $(this).data('id');
             var package_name = $(this).data('package_name');
             var price = $(this).data('price');
@@ -388,23 +411,24 @@ $conn->close();
         });
     </script>
     <script>
-    function openImageViewer(multipleImages) {
-        var images = multipleImages.split(',');
-        var modalBody = document.getElementById('imageViewerBody');
-        modalBody.innerHTML = '';
+        function openImageViewer(multipleImages) {
+            var images = multipleImages.split(',');
+            var modalBody = document.getElementById('imageViewerBody');
+            modalBody.innerHTML = '';
 
-        images.forEach(function(image) {
-            var img = document.createElement('img');
-            img.src = image.trim();
-            img.alt = 'Multiple Image';
-            img.style.width = '100%'; // Adjust width as needed
-            img.style.height = 'auto'; // Maintain aspect ratio
-            modalBody.appendChild(img);
-        });
+            images.forEach(function (image) {
+                var img = document.createElement('img');
+                img.src = image.trim();
+                img.alt = 'Multiple Image';
+                img.style.width = '100%'; // Adjust width as needed
+                img.style.height = 'auto'; // Maintain aspect ratio
+                modalBody.appendChild(img);
+            });
 
-        $('#imageViewerModal').modal('show'); // Show Bootstrap modal
-    }
-</script>
+            $('#imageViewerModal').modal('show'); // Show Bootstrap modal
+        }
+    </script>
 
 </body>
+
 </html>
