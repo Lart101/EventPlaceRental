@@ -183,6 +183,31 @@ $conn->close();
 </style>
 
 <body>
+<nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-lg">
+            <a class="navbar-brand" href="#">
+                Board Mart ADMIN
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="mx-auto">
+                    <ul class="navbar-nav">
+                       
+                        <li class="nav-item">
+                            <a class="nav-link" href="AdminUserAccPanel.php">User</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_package.php">Package</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
     <div class="container" style="max-width: 1200px;
     width: 100%; 
     margin: 10 auto; 

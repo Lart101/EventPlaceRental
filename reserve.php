@@ -28,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->fetch();
     $stmt->close();
 
-    // Calculate total price and reservation fee
     $days = (strtotime($endDate) - strtotime($startDate)) / (60 * 60 * 24) + 1;
     $totalPrice = $days * $pricePerDay;
     $reservationFee = $totalPrice * 0.05;
