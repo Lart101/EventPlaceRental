@@ -67,25 +67,7 @@ while ($stmt->fetch()) {
 $stmt->close();
 
 
-$reservations_finished = [];
-$stmt = $conn->prepare("SELECT r.id, p.package_name, r.start_date, r.end_date, r.total_price
-                        FROM finished_reservations r
-                        INNER JOIN swimming_packages p ON r.package_id = p.id
-                        WHERE r.user_id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$stmt->bind_result($reservation_id, $package_name, $start_date, $end_date, $total_price);
 
-while ($stmt->fetch()) {
-    $reservations_finished[] = [
-        'id' => $reservation_id,
-        'package_name' => $package_name,
-        'start_date' => $start_date,
-        'end_date' => $end_date,
-        'total_price' => $total_price
-    ];
-}
-$stmt->close();
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_reservation'])) {
@@ -104,13 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_reservation'])
     $difference_hours = ($current_time - $start_timestamp) / 3600;
     
     if ($difference_hours <= 24) {
-        
-        $stmt = $conn->prepare("INSERT INTO cancelled_reservations (user_id, package_id, start_date, end_date, total_price)
-                                SELECT user_id, package_id, start_date, end_date, total_price
-                                FROM package_reservations
-                                WHERE id = ? AND user_id = ?");
-        $stmt->bind_param("ii", $reservation_id, $user_id);
-        $stmt->execute();
+     
         
         if ($stmt->affected_rows > 0) {
             

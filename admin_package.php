@@ -57,11 +57,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create"])) {
 
     $profile_image = uploadImage($_FILES["profile_image"]);
     $multiple_images = uploadImage($_FILES["multiple_images"], true);
+    $package_type = $_POST["package_type"];
+
 
     if ($profile_image !== false && !empty($multiple_images)) {
         $multiple_images = implode(',', $multiple_images);
-        $sql = "INSERT INTO swimming_packages (package_name, price, duration, max_pax, inclusions, profile_image, multiple_images)
-                VALUES ('$package_name', '$price', '$duration', '$max_pax', '$inclusions', '$profile_image', '$multiple_images')";
+        $sql = "INSERT INTO swimming_packages (package_name, price, duration, max_pax, inclusions, profile_image, multiple_images, package_type)
+        VALUES ('$package_name', '$price', '$duration', '$max_pax', '$inclusions', '$profile_image', '$multiple_images', '$package_type')";
+
 
         if ($conn->query($sql) === TRUE) {
             $message = "New package created successfully";
@@ -84,6 +87,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
 
     $profile_image = !empty($_FILES["profile_image"]["name"]) ? uploadImage($_FILES["profile_image"]) : false;
     $multiple_images = !empty($_FILES["multiple_images"]["name"][0]) ? uploadImage($_FILES["multiple_images"], true) : false;
+    $package_type = $_POST["package_type"];
+    // Add $package_type to your UPDATE SQL query
+    $sql = "UPDATE swimming_packages SET package_name='$package_name', price='$price', duration='$duration', max_pax='$max_pax', inclusions='$inclusions', profile_image='$profile_image', multiple_images='$multiple_images', package_type='$package_type' WHERE id=$id";
+    
+
 
     if ($profile_image !== false && !empty($multiple_images)) {
         $multiple_images = implode(',', $multiple_images);
@@ -273,52 +281,54 @@ $conn->close();
                 </div>
 
                 <table class="table" id="packageTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Package Name</th>
-                            <th>Price</th>
-                            <th>Duration</th>
-                            <th>Max Pax</th>
-                            <th>Inclusions</th>
-                            <th>Profile Image</th>
-                            <th>Multiple Images</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($package = $swimming_packages->fetch_assoc()) { ?>
-                            <tr>
-                                <td><?php echo $package['id']; ?></td>
-                                <td><?php echo $package['package_name']; ?></td>
-                                <td><?php echo $package['price']; ?></td>
-                                <td><?php echo $package['duration']; ?></td>
-                                <td><?php echo $package['max_pax']; ?></td>
-                                <td><?php echo $package['inclusions']; ?></td>
-                                <td>
-                                    <img src="<?php echo $package['profile_image']; ?>" alt="Profile Image"
-                                        style="width: 100px; height: 100px; cursor: pointer;"
-                                        onclick="openImageViewer('<?php echo $package['multiple_images']; ?>')">
-                                </td>
-                                <td>
-                                    <div class="collage">
-                                        <?php
-                                        $images = explode(',', $package['multiple_images']);
-                                        $total_images = count($images);
-                                        $max_display = 2;
+                <thead>
+    <tr>
+        <th>ID</th>
+        <th>Package Name</th>
+        <th>Package Type</th>
+        <th>Price</th>
+        <th>Duration</th>
+        <th>Max Pax</th>
+        <th>Inclusions</th>
+        <th>Profile Image</th>
+        <th>Multiple Images</th>
+        <th>Actions</th>
+    </tr>
+</thead>
+<tbody>
+    <?php while ($package = $swimming_packages->fetch_assoc()) { ?>
+        <tr>
+            <td><?php echo $package['id']; ?></td>
+            <td><?php echo $package['package_name']; ?></td>
+            <td><?php echo $package['package_type']; ?></td>
+            <td><?php echo $package['price']; ?></td>
+            <td><?php echo $package['duration']; ?></td>
+            <td><?php echo $package['max_pax']; ?></td>
+            <td><?php echo $package['inclusions']; ?></td>
+            <td>
+                <img src="<?php echo $package['profile_image']; ?>" alt="Profile Image"
+                    style="width: 100px; height: 100px; cursor: pointer;"
+                    onclick="openImageViewer('<?php echo $package['multiple_images']; ?>')">
+            </td>
+            <td>
+                <div class="collage">
+                    <?php
+                    $images = explode(',', $package['multiple_images']);
+                    $total_images = count($images);
+                    $max_display = 2;
 
-                                        foreach (array_slice($images, 0, min($max_display, $total_images)) as $image) {
-                                            echo "<img src='$image' alt='Multiple Image' style='width: 100px; height: 100px; margin-right: 5px; cursor: pointer;' onclick='openImageViewer(\"{$package['multiple_images']}\")'>";
-                                        }
+                    foreach (array_slice($images, 0, min($max_display, $total_images)) as $image) {
+                        echo "<img src='$image' alt='Multiple Image' style='width: 100px; height: 100px; margin-right: 5px; cursor: pointer;' onclick='openImageViewer(\"{$package['multiple_images']}\")'>";
+                    }
 
-                                        if ($total_images > $max_display) {
-                                            echo "<button class='btn btn-link p-0' onclick='openImageViewer(\"{$package['multiple_images']}\")'>Show More</button>";
-                                        }
-                                        ?>
-                                    </div>
-                                </td>
-                                <td>
-    <button class="btn btn-primary btn-sm edit-package-btn" data-toggle="modal"
+                    if ($total_images > $max_display) {
+                        echo "<button class='btn btn-link p-0' onclick='openImageViewer(\"{$package['multiple_images']}\")'>Show More</button>";
+                    }
+                    ?>
+                </div>
+            </td>
+            <td>
+            <button class="btn btn-primary btn-sm edit-package-btn" data-toggle="modal"
         data-target="#editPackageModal" data-id="<?php echo $package['id']; ?>"
         data-package_name="<?php echo $package['package_name']; ?>"
         data-price="<?php echo $package['price']; ?>"
@@ -326,10 +336,11 @@ $conn->close();
         data-max_pax="<?php echo $package['max_pax']; ?>"
         data-inclusions="<?php echo $package['inclusions']; ?>">Edit</button>
     <a href="?delete=<?php echo $package['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this package?')" style="margin-top: 10px;">Delete</a>
-</td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
+            </td>
+        </tr>
+    <?php } ?>
+</tbody>
+
 
 
             </div>
@@ -389,6 +400,15 @@ $conn->close();
                                 <label for="inclusions">Inclusions:</label>
                                 <textarea id="inclusions" name="inclusions" class="form-control" required></textarea>
 
+
+                                <label for="package_type">Package Type:</label>
+<select id="package_type" name="package_type" class="form-control" required>
+    <option value="Day">Day</option>
+    <option value="Overnight">Overnight</option>
+    <option value="Combo">Combo</option>
+</select>
+
+
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                     <button type="submit" class="btn btn-primary">Create Package</button>
@@ -437,6 +457,14 @@ $conn->close();
                                 <label for="edit_inclusions">Inclusions:</label>
                                 <textarea id="edit_inclusions" name="inclusions" class="form-control"
                                     required></textarea>
+
+                                    <label for="edit_package_type">Package Type:</label>
+<select id="edit_package_type" name="package_type" class="form-control" required>
+    <option value="Day">Day</option>
+    <option value="Overnight">Overnight</option>
+    <option value="Combo">Combo</option>
+</select>
+
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
