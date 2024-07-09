@@ -121,7 +121,7 @@ if (!isset($_SESSION['user_id'])) {
                                     <img src="' . $row["profile_image"] . '" class="card-img-top" alt="' . $row["package_name"] . '">
                                     <div class="card-body">
                                         <h5 class="card-title">' . $row["package_name"] . '</h5>
-                                        <p class="card-text">Price: $' . $row["price"] . '<br>
+                                        <p class="card-text">Price: ₱' . $row["price"] . '<br>
                                         Duration: ' . $row["duration"] . '<br>
                                         Max Pax: ' . $row["max_pax"] . '</p>
                                         <a href="package_details.php?id=' . $row["id"] . '" class="btn btn-outline-dark">See Details</a>
