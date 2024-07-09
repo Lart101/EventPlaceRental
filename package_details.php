@@ -1,25 +1,38 @@
 <?php
 session_start();
 
-
 $conn = new mysqli("localhost", "root", "", "event_store");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit();
 }
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $packageId = htmlspecialchars(mysqli_real_escape_string($conn, $_POST['package_id']));
     $start_date = htmlspecialchars(mysqli_real_escape_string($conn, $_POST['start_date']));
     $end_date = htmlspecialchars(mysqli_real_escape_string($conn, $_POST['end_date']));
 
+    // Validate end date selection
+    if (empty($end_date)) {
+        $_SESSION['reservation_error'] = "Please select an end date.";
+        header("Location: package_details.php?id=$packageId");
+        exit();
+    }
 
+    // Check date validation
+    $startTimestamp = strtotime($start_date);
+    $endTimestamp = strtotime($end_date);
+    if ($endTimestamp <= $startTimestamp) {
+        $_SESSION['reservation_error'] = "End date must be after start date.";
+        header("Location: package_details.php?id=$packageId");
+        exit();
+    }
+
+    // Check for overlapping reservations
     $overlap = false;
     $reservedSql = "SELECT * FROM package_reservations WHERE package_id = ? AND ((start_date <= ? AND end_date >= ?) OR (start_date <= ? AND end_date >= ?) OR (start_date >= ? AND end_date <= ?))";
     $stmt = $conn->prepare($reservedSql);
@@ -38,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-
+    // Calculate total price
     $sql = "SELECT price FROM swimming_packages WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $packageId);
@@ -49,25 +62,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $totalPrice = ($price * (strtotime($end_date) - strtotime($start_date)) / (60 * 60 * 24)) + $price * 0.05;
 
-
-
-
-
+    // Insert reservation
     $insertSql = "INSERT INTO package_reservations (package_id, user_id, start_date, end_date, total_price) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($insertSql);
     $stmt->bind_param("iisss", $packageId, $_SESSION['user_id'], $start_date, $end_date, $totalPrice);
     $result = $stmt->execute();
     $stmt->close();
 
-
     $_SESSION['reservation_success'] = $result;
-
 
     header("Location: package_details.php?id=$packageId");
     exit();
 }
 
-
+// Fetch package details
 $packageId = htmlspecialchars(mysqli_real_escape_string($conn, $_GET['id']));
 $sql = "SELECT package_name, inclusions, price, duration, max_pax, multiple_images FROM swimming_packages WHERE id = ?";
 $stmt = $conn->prepare($sql);
@@ -80,6 +88,7 @@ $stmt->close();
 
 $packageImages = explode(",", $multiple_images);
 
+// Fetch reserved dates
 $reservedDates = [];
 $reservedSql = "SELECT start_date, end_date FROM package_reservations WHERE package_id = ?";
 $stmt = $conn->prepare($reservedSql);
@@ -93,6 +102,7 @@ $stmt->close();
 
 $conn->close();
 ?>
+
 
 
 <!DOCTYPE html>
@@ -176,11 +186,12 @@ $conn->close();
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg fixed-top">
+<nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-lg">
-            <a class="navbar-brand" href="#">
-                Board Mart Event Place
-            </a>
+        <a class="navbar-brand" href="index.html">
+            <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            Board Mart Event Place
+        </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -188,6 +199,9 @@ $conn->close();
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="mx-auto">
                     <ul class="navbar-nav">
+                    <li class="nav-item">
+                            <a class="nav-link" href="index1.php">Home</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="swimming_packages.php">Packages</a>
                         </li>
@@ -198,19 +212,18 @@ $conn->close();
                             <a class="nav-link" href="profilecopy.php">Profile</a>
                         </li>
                         <?php
-
+                      
                         if (!isset($_SESSION['user_id'])):
-                            ?>
-
+                        ?>
+                         
                             <li class="nav-item login">
                                 <a class="nav-link" href="login.php">Login</a>
                             </li>
                         <?php else: ?>
-
+                            
                             <li class="nav-item logout">
                                 <form action="logout.php" method="POST">
-                                    <button type="submit" class="nav-link btn btn-link"
-                                        onclick="return confirmLogout()">Logout</button>
+                                    <button type="submit" class="nav-link btn btn-link" onclick="return confirmLogout()">Logout</button>
                                 </form>
                             </li>
                         <?php endif; ?>
@@ -275,7 +288,7 @@ $conn->close();
                         <span class="text-danger">You can only use the reservation within 5 hours</span>
                         <input type="text" id="reservation_fee" class="form-control" readonly>
                     </div>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#paymentModal"
+                    <button type="botton" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#paymentModal"
                         onclick="showPaymentModal()">Reserve Now</button>
 
                 </form>
@@ -435,8 +448,7 @@ $conn->close();
 
                 if (startDate && endDate) {
                     if (!(endDate < reservedStart || startDate > reservedEnd)) {
-                        endDateInput.value = ''; // Clear end date if overlap found
-                        alert('This date range includes already reserved dates. Please select another range.');
+                 
                         return;
                     }
                 }
@@ -447,14 +459,32 @@ $conn->close();
             const startDateInput = document.getElementById('start_date');
             const endDateInput = document.getElementById('end_date');
 
-            if (endDateInput.disabled) {
-                alert('Please select valid dates.');
+            if (!endDateInput.value) {
+                alert('Please select an end date.');
                 return false;
             }
-            // Check for overlapping dates
-            disableReservedDates();
 
-         
+      
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+            if (endDate <= startDate) {
+                alert('End date must be after start date.');
+                return false;
+            }
+
+        
+            const reservedDates = <?php echo json_encode($reservedDates); ?>;
+            for (let i = 0; i < reservedDates.length; i++) {
+                const reservedStart = new Date(reservedDates[i]['start_date']);
+                const reservedEnd = new Date(reservedDates[i]['end_date']);
+
+                if (!(endDate < reservedStart || startDate > reservedEnd)) {
+                    alert('This date range includes already reserved dates. Please select another range.');
+                    return false;
+                }
+            }
+
+            // Proceed to form submission or modal opening
             return true;
         }
     </script>
@@ -495,7 +525,7 @@ $conn->close();
 
     let isValid = true;
 
-    // Validate Card Number (must be exactly 16 digits)
+
     if (!validateCardNumber(cardNumber)) {
         document.getElementById('card_number').classList.add('is-invalid');
         isValid = false;
@@ -503,7 +533,7 @@ $conn->close();
         document.getElementById('card_number').classList.remove('is-invalid');
     }
 
-    // Validate Expiry Date (must not be today or in the past)
+   
     if (!validateExpiryDate(expiryDate)) {
         document.getElementById('expiry_date').classList.add('is-invalid');
         isValid = false;
@@ -511,7 +541,7 @@ $conn->close();
         document.getElementById('expiry_date').classList.remove('is-invalid');
     }
 
-    // Validate CVV (3 or 4 digits)
+ 
     if (!validateCVV(cvv)) {
         document.getElementById('cvv').classList.add('is-invalid');
         isValid = false;
@@ -523,39 +553,36 @@ $conn->close();
 }
 
 function validateCardNumber(number) {
-    // Remove all non-digit characters
+ 
     number = number.replace(/\D/g, '');
 
-    // Check if length is exactly 16 digits
+   
     return /^\d{16}$/.test(number);
 }
 
 function validateExpiryDate(date) {
-    // Check if date is in MM/YY format
+    
     if (!/^\d{2}\/\d{2}$/.test(date)) {
         return false;
     }
 
     const [month, year] = date.split('/').map(Number);
 
-    // Get current date
+ 
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear() % 100;
     const currentMonth = currentDate.getMonth() + 1;
 
-    // Check if expiry date is not in the past or today
+  
     return !(year < currentYear || (year === currentYear && month < currentMonth));
 }
 
 function validateCVV(cvv) {
-    // Validate CVV (3 or 4 digits)
+    
     return /^\d{3,4}$/.test(cvv);
 }
 
-        function validateCVV(cvv) {
-            // Check if CVV is 3 or 4 digits
-            return /^\d{3,4}$/.test(cvv);
-        }
+        
     </script>
 
 

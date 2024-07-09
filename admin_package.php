@@ -180,14 +180,51 @@ $conn->close();
         font-weight: bold;
         cursor: pointer;
     }
+    /* NavBar to Repa */
+
+.navbar {
+    background-color: whitesmoke; 
+   
+}
+
+.navbar-nav .nav-link {
+    color: black;
+    font-size: 1.1rem; 
+}
+
+.navbar-nav .nav-item {
+    padding: 0 1rem;
+}
+
+.navbar .navbar-nav .nav-item{
+    position: relative;
+}
+
+.navbar .navbar-nav .nav-item::after{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    content: '';
+    background-color: black;
+    width: 0%;
+    height: 4px;
+    transition: 500ms;
+}
+
+.navbar .navbar-nav .nav-item:hover:after{
+    width: 100%;
+}
+
 </style>
 
 <body>
 <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-lg">
-            <a class="navbar-brand" href="#">
-                Board Mart ADMIN
-            </a>
+        <a class="navbar-brand" href="admin_package.php">
+            <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            Board Mart Package Admin
+        </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -195,14 +232,13 @@ $conn->close();
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="mx-auto">
                     <ul class="navbar-nav">
-                       
-                        <li class="nav-item">
-                            <a class="nav-link" href="AdminUserAccPanel.php">User</a>
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="admin_package.php">Package</a>
                         </li>
-                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="AdminUserAccPanel.php">User</a>
+                        </li>
+                       
                     </ul>
                 </div>
             </div>
@@ -215,7 +251,7 @@ $conn->close();
     background: #fff;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);margin-top:5%">
         <div class="form-left">
             <div class="title">Admin Panel - Swimming Packages</div>
 

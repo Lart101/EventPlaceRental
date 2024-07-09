@@ -17,21 +17,23 @@ if (!isset($_SESSION['user_id'])) {
     <link href="default.css" rel="stylesheet">
 </head>
 <style>
-    .bg{
-    
-    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('img/products/bgPD.jpeg');
-    background-size: cover;
-    background-position: center;
-    padding: 20px;
-    padding-top: 20%;
-}
+     .bg {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('img/profile/bg.jpg');
+            background-size: cover;
+            background-position: center;
+            padding: 20px;
+            padding-top: 20%;
+            color: whitesmoke;
+            height: 600px;
+        }
 </style>
 <body>
 <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-lg">
-            <a class="navbar-brand" href="#">
-                Board Mart Event Place
-            </a>
+        <a class="navbar-brand" href="index.html">
+            <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            Board Mart Event Place
+        </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -39,6 +41,9 @@ if (!isset($_SESSION['user_id'])) {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="mx-auto">
                     <ul class="navbar-nav">
+                    <li class="nav-item">
+                            <a class="nav-link" href="index1.php">Home</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="swimming_packages.php">Packages</a>
                         </li>
@@ -69,17 +74,19 @@ if (!isset($_SESSION['user_id'])) {
             </div>
         </div>
     </nav>
-<section class="bg" id="hero">
-    <div class="container-lg" style="margin-bottom: 20%;">
-        <div class="row align-items-center">
-            <div class="col-sm-6 fade-in">
-                <h1 class="display- fw-bold" style="color: #FFFAB7;">Swimming Packages</h1>
-                <p style="color: whitesmoke;">Choose your preferred swimming package!</p>
-                <!-- Link to reserve or manage packages if needed -->
+
+
+    <section class="bg" id="hero">
+        <div class="container-lg">
+            <div class="row align-items-center">
+                <div class="col-sm-6 fade-in">
+                    <h1 class="display fw-bold" style="color: #FFFAB7;">Swimming Packages</h1>
+                    <p>Choose your preferred swimming package!</p>
+                    
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
 <div class="container">
     <section id="packages" class="py-5 fade-in">

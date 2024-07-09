@@ -105,10 +105,70 @@ $conn->close();
         .table-responsive {
             overflow-x: auto;
         }
+        /* NavBar to Repa */
+
+.navbar {
+    background-color: whitesmoke; 
+}
+
+.navbar-nav .nav-link {
+    color: black;
+    font-size: 1.1rem; 
+}
+
+.navbar-nav .nav-item {
+    padding: 0 1rem;
+}
+
+.navbar .navbar-nav .nav-item{
+    position: relative;
+}
+
+.navbar .navbar-nav .nav-item::after{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    content: '';
+    background-color: black;
+    width: 0%;
+    height: 4px;
+    transition: 500ms;
+}
+
+.navbar .navbar-nav .nav-item:hover:after{
+    width: 100%;
+}
+
     </style>
 </head>
 <body>
-    <div class="container">
+<nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-lg">
+        <a class="navbar-brand" href="AdminUserAccPanel.php">
+            <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            Board Mart User Admin
+        </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="mx-auto">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_package.php">Package</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="AdminUserAccPanel.php">User</a>
+                        </li>
+                       
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container" style="margin-top:5%" >
         <div class="form-left">
             <div class="title">Admin Panel</div>
         

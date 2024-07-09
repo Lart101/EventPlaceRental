@@ -6,6 +6,9 @@ html{
 section[class^="container"]{
     padding: 4rem 2rem;
 }
+body{
+    font-family: Helvetica, sans-serif;
+}
 
 .bg{
     

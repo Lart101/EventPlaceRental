@@ -116,9 +116,10 @@
     </div>
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-lg">
-            <a class="navbar-brand" href="#">
-                Board Mart Event Place
-            </a>
+        <a class="navbar-brand" href="index.html">
+            <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            Board Mart Event Place
+        </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -126,6 +127,9 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="mx-auto">
                     <ul class="navbar-nav">
+                    <li class="nav-item">
+                            <a class="nav-link" href="index1.php">Home</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="swimming_packages.php">Packages</a>
                         </li>
@@ -156,6 +160,8 @@
             </div>
         </div>
     </nav>
+
+
 
     <section id="map" class="py-5 fade-in">
         <div class="container" style="padding-top: 5%;">
@@ -200,44 +206,48 @@
     
 
     <section id="contact" class="py-5 fade-in">
-        <div class="container">
-            <h1 class="text-center">WE APPRECIATE YOUR REVIEW!</h1>
-            <div class="row justify-content-center mt-5">
-                <div class="col-md-8 col-lg-6 mb-4">
-                    <form id="contact-form" action="contact.php" method="POST">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="message" class="form-label">Message</label>
-                            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <h3>Rate our services!</h3>
-                            <div class="star-rating">
-                                <input type="radio" id="5-stars" name="rating" value="5" required>
-                                <label for="5-stars" class="bi bi-star-fill"></label>
-                                <input type="radio" id="4-stars" name="rating" value="4" required>
-                                <label for="4-stars" class="bi bi-star-fill"></label>
-                                <input type="radio" id="3-stars" name="rating" value="3" required>
-                                <label for="3-stars" class="bi bi-star-fill"></label>
-                                <input type="radio" id="2-stars" name="rating" value="2" required>
-                                <label for="2-stars" class="bi bi-star-fill"></label>
-                                <input type="radio" id="1-star" name="rating" value="1" required>
-                                <label for="1-star" class="bi bi-star-fill"></label>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary d-block mx-auto">Submit</button>
-                    </form>
-                </div>
+    <div class="container">
+        <h1 class="text-center">WE APPRECIATE YOUR REVIEW!</h1>
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-8 col-lg-6 mb-4">
+                <form id="contact-form" action="contact.php" method="POST">
+                    <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+<input type="text" class="form-control" id="name" name="name" required pattern="[A-Za-z]+" title="Please enter letters only">
+
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <div class="mb-3">
+    <h3>Rate our services!</h3>
+    <div class="star-rating">
+        <input type="radio" id="5-stars" name="rating" value="5" required>
+        <label for="5-stars" class="bi bi-star-fill"></label>
+        <input type="radio" id="4-stars" name="rating" value="4" required>
+        <label for="4-stars" class="bi bi-star-fill"></label>
+        <input type="radio" id="3-stars" name="rating" value="3" required>
+        <label for="3-stars" class="bi bi-star-fill"></label>
+        <input type="radio" id="2-stars" name="rating" value="2" required>
+        <label for="2-stars" class="bi bi-star-fill"></label>
+        <input type="radio" id="1-star" name="rating" value="1" required>
+        <label for="1-star" class="bi bi-star-fill"></label>
+    </div>
+    <small class="text-danger">Please rate our services.</small>
+</div>
+
+                    <button type="submit" class="btn btn-primary d-block mx-auto">Submit</button>
+                </form>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
 
     <footer class="footer mt-5">
         <div class="container">

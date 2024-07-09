@@ -109,7 +109,11 @@
             <button type="button" class="resend-btn" id="resend-btn" disabled>Resend OTP</button>
         </div>
         <label for="new-password">New Password:</label>
-        <input type="password" id="new-password" name="new_password" required>
+<input type="password" id="new-password" name="new_password" required
+       pattern="(?=.*[a-z])(?=.*[A-Z]).{6,}"
+       title="Password must contain at least one uppercase letter, one lowercase letter, and be at least 6 characters long."
+       placeholder="At least 1 uppercase, 1 lowercase, min 6 characters">
+
         <label for="confirm-password">Confirm Password:</label>
         <input type="password" id="confirm-password" name="confirm_password" required>
         <button type="submit">Reset Password</button>
