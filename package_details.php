@@ -183,6 +183,7 @@ $conn->close();
             width: calc(50% - 5px);
             height: auto;
             cursor: pointer;
+
         }
 
         .image-viewer {
@@ -197,6 +198,7 @@ $conn->close();
             padding: 20px;
             box-sizing: border-box;
             overflow-y: auto;
+
         }
 
         .image-viewer img {
@@ -215,33 +217,76 @@ $conn->close();
             font-size: 24px;
             cursor: pointer;
         }
+
     </style>
 </head>
 <body>
+<nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-lg">
+            <a class="navbar-brand" href="#">
+                Board Mart Event Place
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="mx-auto">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="swimming_packages.php">Packages</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contactmain.php">Contact</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="profilecopy.php">Profile</a>
+                        </li>
+                        <?php
+                      
+                        if (!isset($_SESSION['user_id'])):
+                        ?>
+                         
+                            <li class="nav-item login">
+                                <a class="nav-link" href="login.php">Login</a>
+                            </li>
+                        <?php else: ?>
+                            
+                            <li class="nav-item logout">
+                                <form action="logout.php" method="POST">
+                                    <button type="submit" class="nav-link btn btn-link" onclick="return confirmLogout()">Logout</button>
+                                </form>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
     <nav aria-label="breadcrumb" style="padding-top: 5%; margin-left: 20px;">
         <ol class="breadcrumb fade-in">
             <li class="breadcrumb-item"><a href="swimming.php">Swimming Packages</a></li>
             <li class="breadcrumb-item active" aria-current="page"><?php echo $package_name; ?></li>
         </ol>
     </nav>
+
     <div class="container mt-5 pt-5 fade-in">
+        <div class="row">
+        <div class="container mt-5 pt-5 fade-in">
         <div class="row">
             <div class="col-md-6">
                 <div class="image-collage" id="imageCollage">
                     <?php
                     $counter = 0;
-                    foreach ($packageImages as $image) {
-                        echo '<img src="' . $image . '" class="img-fluid" alt="' . $package_name . '" onclick="openImageViewer(' . $counter . ')">';
+                    foreach ($packageImages as $index => $image) {
+                        if ($counter < 4) {
+                            echo '<img src="' . $image . '" class="img-fluid" alt="' . $package_name . '" onclick="openImageViewer(' . $index . ')">';
+                        } else {
+                            echo '<span id="showMoreBtn" class="btn btn-link text-decoration-none" onclick="showAllImages()">Show More</span>';
+                            break;
+                        }
                         $counter++;
-                    }
-                    ?>
-                    <span id="showMoreBtn" class="text-primary" onclick="showAllImages()">View More</span>
-                </div>
-                <div class="image-viewer" id="imageViewer">
-                    <span class="close-btn" onclick="closeImageViewer()">&times;</span>
-                    <?php
-                    foreach ($packageImages as $image) {
-                        echo '<img src="' . $image . '" class="img-fluid" alt="' . $package_name . '">';
                     }
                     ?>
                 </div>
@@ -295,29 +340,34 @@ $conn->close();
             </div>
         </div>
     </div>
+    <div class="image-viewer" id="imageViewer">
+        <?php foreach ($packageImages as $index => $image): ?>
+            <img src="<?php echo $image; ?>" class="img-fluid <?php if ($index >= 4)
+                   echo 'hidden-image'; ?>"
+                alt="<?php echo $package_name; ?>">
+        <?php endforeach; ?>
+        <span class="close-btn" onclick="closeImageViewer()">&times;</span>
+    </div>
     <script>
-        function openImageViewer(index) {
-            var viewer = document.getElementById('imageViewer');
-            var images = viewer.getElementsByTagName('img');
-            for (var i = 0; i < images.length; i++) {
-                images[i].style.display = 'none';
-            }
-            images[index].style.display = 'block';
-            viewer.style.display = 'block';
-        }
+        document.getElementById('showMoreBtn').addEventListener('click', function () {
+            const hiddenImages = document.querySelectorAll('.hidden-image');
+            hiddenImages.forEach(function (image) {
+                image.classList.remove('hidden-image');
+            });
+            document.getElementById('imageViewer').style.display = 'block';
+        });
 
         function closeImageViewer() {
-            document.getElementById('imageViewer').style.display = 'none';
-        }
+            const imageViewer = document.getElementById('imageViewer');
+            imageViewer.style.display = 'none';
 
-        function showAllImages() {
-            var collage = document.getElementById('imageCollage');
-            var images = collage.getElementsByTagName('img');
-            for (var i = 0; i < images.length; i++) {
-                images[i].style.display = 'inline-block';
-            }
-            document.getElementById('showMoreBtn').style.display = 'none';
+            // Hide all images again when closing viewer
+            const hiddenImages = document.querySelectorAll('.hidden-image');
+            hiddenImages.forEach(function (image) {
+                image.classList.add('hidden-image');
+            });
         }
     </script>
+
 </body>
 </html>
