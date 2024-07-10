@@ -155,7 +155,8 @@ $conn->close();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
     <link href="default.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
+   <style>
         .reserved-dates {
             margin-top: 20px;
         }
@@ -172,6 +173,22 @@ $conn->close();
             padding: 5px 10px;
             border-radius: 5px;
         }
+        
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 20px 0;
+        }
+
+        .footer a {
+            color: #ffffff;
+        }
+
+        .footer a:hover {
+            text-decoration: none;
+            color: #ffc107;
+        }
+
 
         .image-collage {
             display: flex;
@@ -223,9 +240,10 @@ $conn->close();
 <body>
 <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-lg">
-            <a class="navbar-brand" href="#">
-                Board Mart Event Place
-            </a>
+        <a class="navbar-brand" href="index.html">
+            <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            Board Mart Event Place
+        </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -233,6 +251,9 @@ $conn->close();
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="mx-auto">
                     <ul class="navbar-nav">
+                    <li class="nav-item">
+                            <a class="nav-link" href="index1.php">Home</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="swimming_packages.php">Packages</a>
                         </li>
@@ -243,7 +264,7 @@ $conn->close();
                             <a class="nav-link" href="profilecopy.php">Profile</a>
                         </li>
                         <?php
-                      
+                       
                         if (!isset($_SESSION['user_id'])):
                         ?>
                          
@@ -272,8 +293,6 @@ $conn->close();
     </nav>
 
     <div class="container mt-5 pt-5 fade-in">
-        <div class="row">
-        <div class="container mt-5 pt-5 fade-in">
         <div class="row">
             <div class="col-md-6">
                 <div class="image-collage" id="imageCollage">
@@ -340,14 +359,44 @@ $conn->close();
             </div>
         </div>
     </div>
+
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <p>&copy; 2024 Board Mart Event Place. All Rights Reserved.</p>
+                    <div class="mt-4">
+                        <h3>Follow Us on:</h3>
+                        <ul class="list-inline">
+                            <li class="list-inline-item">
+                                <a href="https://www.facebook.com/BoardMartsEventPlace" target="_blank">
+                                    <i class="bi bi-facebook" style="font-size: 1rem; margin-right: 10px;"></i>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="https://www.instagram.com/boardmarseventplace" target="_blank">
+                                    <i class="bi bi-instagram" style="font-size: 1rem; margin-right: 10px;"></i>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="https://x.com/Boardmart" target="_blank">
+                                    <i class="bi bi-twitter" style="font-size: 1rem; margin-right: 10px;"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <div class="image-viewer" id="imageViewer">
         <?php foreach ($packageImages as $index => $image): ?>
-            <img src="<?php echo $image; ?>" class="img-fluid <?php if ($index >= 4)
-                   echo 'hidden-image'; ?>"
-                alt="<?php echo $package_name; ?>">
+            <img src="<?php echo $image; ?>" class="img-fluid hidden-image" alt="<?php echo $package_name; ?>">
         <?php endforeach; ?>
         <span class="close-btn" onclick="closeImageViewer()">&times;</span>
     </div>
+
     <script>
         document.getElementById('showMoreBtn').addEventListener('click', function () {
             const hiddenImages = document.querySelectorAll('.hidden-image');
@@ -368,6 +417,7 @@ $conn->close();
             });
         }
     </script>
-
 </body>
+
+
 </html>

@@ -14,6 +14,7 @@ if (!isset($_SESSION['user_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swimming Packages - Board Mart Event Place</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
     <link href="default.css" rel="stylesheet">
     <style>
         .bg {
@@ -28,6 +29,22 @@ if (!isset($_SESSION['user_id'])) {
         .card {
             margin-bottom: 20px;
         }
+        
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 20px 0;
+        }
+
+        .footer a {
+            color: #ffffff;
+        }
+
+        .footer a:hover {
+            text-decoration: none;
+            color: #ffc107;
+        }
+
     </style>
 </head>
 <body>
@@ -138,7 +155,37 @@ if (!isset($_SESSION['user_id'])) {
                 ?>
             </div>
         </section>
+      
     </div>
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <p>&copy; 2024 Board Mart Event Place. All Rights Reserved.</p>
+                    <div class="mt-4">
+                        <h3>Follow Us on:</h3>
+                        <ul class="list-inline">
+                            <li class="list-inline-item">
+                                <a href="https://www.facebook.com/BoardMartsEventPlace" target="_blank">
+                                    <i class="bi bi-facebook" style="font-size: 1rem; margin-right: 10px;"></i>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="https://www.instagram.com/boardmarseventplace" target="_blank">
+                                    <i class="bi bi-instagram" style="font-size: 1rem; margin-right: 10px;"></i>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="https://x.com/Boardmart" target="_blank">
+                                    <i class="bi bi-twitter" style="font-size: 1rem; margin-right: 10px;"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <div id="notification" class="notification"></div>
 
