@@ -15,7 +15,7 @@ $response = ['status' => 'error', 'message' => 'Unknown error'];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
-    $email = 'user_email@example.com'; // Replace with the actual email fetching logic
+    $email = ''; // Actual email fetching logic will go here
 
     $sql = "SELECT email FROM users WHERE id = ?";
     $stmt = $conn->prepare($sql);
@@ -31,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
         $mail = new PHPMailer(true);
 
         try {
+            // SMTP configuration
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
@@ -39,14 +40,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
+            // Email content
             $mail->setFrom('boardmart020@gmail.com', 'Board Mart');
             $mail->addAddress($email);
 
             $mail->isHTML(true);
             $mail->Subject = 'Password Reset OTP';
-            $mail->Body = "Your OTP for password reset is $otp.";
+            $mail->Body = "<p>Dear User,</p><p>Your OTP for password reset is: <strong>$otp</strong>.</p><p>If you did not request this OTP, please ignore this email.</p>";
             $mail->AltBody = "Your OTP for password reset is $otp.";
 
+            // Send email
             $mail->send();
             $response = ['status' => 'success', 'message' => 'OTP resent to your email.'];
         } catch (Exception $e) {

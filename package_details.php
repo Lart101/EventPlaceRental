@@ -255,7 +255,7 @@ $conn->close();
                                 value="Extended stay" onchange="calculateTotalPrice()">
                             <label class="form-check-label" for="extendedStay">Extended stay (₱1,000 per hour)</label>
                             <input type="number" id="extendedStayHours" name="extended_stay_hours"
-                                class="form-control mt-2" min="0" value="0" onchange="calculateTotalPrice()">
+                                class="form-control mt-2" min="0" max="2" value="0" onchange="calculateTotalPrice()">
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="familyRoom" name="add_ons[]"

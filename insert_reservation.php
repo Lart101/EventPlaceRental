@@ -7,6 +7,12 @@ $dbname = 'event_store';
 $username = 'root';
 $password = '';
 
+// Include PHPMailer classes
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php'; // Adjust the path as needed
+
 try {
     // Create PDO connection
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
@@ -18,6 +24,11 @@ try {
         $userId = $_SESSION['user_id'] ?? null;
         $startDate = $_POST['start_date'] ?? null;
         $endDate = $_POST['end_date'] ?? null;
+
+        if ($endDate === null) {
+            // If end date is null, set it to start date
+            $endDate = $_POST['start_date'] ?? null;
+        }
         $addOns = isset($_POST['add_ons']) ? $_POST['add_ons'] : [];
         $extendedStayHours = isset($_POST['extended_stay_hours']) ? $_POST['extended_stay_hours'] : 0;
         $totalPrice = $_POST['total_price'] ?? 0;
@@ -45,6 +56,56 @@ try {
 
         $reservationId = $pdo->lastInsertId();
 
+        // Fetch user email
+        $stmtUser = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+        $stmtUser->execute([$userId]);
+        $userEmail = $stmtUser->fetchColumn();
+        
+        // Send email receipt
+        if ($userEmail) {
+            $mail = new PHPMailer(true);
+            
+            // SMTP configuration
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'boardmart020@gmail.com';
+            $mail->Password   = 'wojvwvhystherxdb';
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+
+            $mail->setFrom('boardmart020@gmail.com', 'Board Mart');
+            
+            // Recipient
+            $mail->addAddress($userEmail);
+            
+            // Email content
+            $mail->isHTML(true);
+            $mail->Subject = 'Reservation Receipt';
+            
+            // Construct email body
+            $mailBody = "<p>Dear Customer,</p>";
+            $mailBody .= "<p>Thank you for your reservation with Board Mart!</p>";
+            $mailBody .= "<p>Reservation Details:</p>";
+            $mailBody .= "<ul>";
+            $mailBody .= "<li>Reservation ID: $reservationId</li>";
+            $mailBody .= "<li>Package ID: $packageId</li>";
+            $mailBody .= "<li>Start Date: $startDate</li>";
+            $mailBody .= "<li>End Date: $endDate</li>";
+            $mailBody .= "<li>Total Price: ₱$totalPrice</li>";
+       
+            
+            $mailBody .= "</ul>";
+            $mailBody .= "<p>Thank you for choosing Board Mart. If you have any questions, feel free to contact us.</p>";
+            $mailBody .= "<p>Best Regards,<br>Board Mart Team</p>";
+            
+            $mail->Body    = $mailBody;
+            
+            $mail->send();
+        } else {
+            echo "User email not found.";
+        }
+
         // Redirect to success page after successful reservation
         header('Location: reservation_success.php');
         exit();
@@ -55,5 +116,7 @@ try {
     }
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();
+} catch (Exception $e) {
+    echo "Mailer Error: " . $mail->ErrorInfo;
 }
 ?>
