@@ -129,9 +129,9 @@ $stmt_package->close();
 
 $packageImages = explode(",", $multiple_images);
 
-// Fetch reserved dates with status 'accepted'
+// Fetch reserved dates
 $reservedDates = [];
-$sql_reserved = "SELECT start_date, end_date FROM package_reservations WHERE package_id = ? AND status = 'accepted'";
+$sql_reserved = "SELECT start_date, end_date FROM package_reservations WHERE package_id = ? AND status != 'cancelled'";
 $stmt_reserved = $conn->prepare($sql_reserved);
 $stmt_reserved->bind_param("i", $packageId);
 $stmt_reserved->execute();
@@ -147,7 +147,6 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -155,11 +154,9 @@ $conn->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
     <link href="default.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
-    <style>
+   <style>
         .reserved-dates {
             margin-top: 20px;
         }
@@ -176,7 +173,7 @@ $conn->close();
             padding: 5px 10px;
             border-radius: 5px;
         }
-
+        
         .footer {
             background-color: #343a40;
             color: white;
@@ -237,16 +234,16 @@ $conn->close();
             font-size: 24px;
             cursor: pointer;
         }
+
     </style>
 </head>
-
 <body>
-    <nav class="navbar navbar-expand-lg fixed-top">
+<nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-lg">
-            <a class="navbar-brand" href="index.html">
-                <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
-                Board Mart Event Place
-            </a>
+        <a class="navbar-brand" href="index.html">
+            <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            Board Mart Event Place
+        </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -254,7 +251,7 @@ $conn->close();
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="mx-auto">
                     <ul class="navbar-nav">
-                        <li class="nav-item">
+                    <li class="nav-item">
                             <a class="nav-link" href="index1.php">Home</a>
                         </li>
                         <li class="nav-item">
@@ -267,19 +264,18 @@ $conn->close();
                             <a class="nav-link" href="profilecopy.php">Profile</a>
                         </li>
                         <?php
-
+                       
                         if (!isset($_SESSION['user_id'])):
-                            ?>
-
+                        ?>
+                         
                             <li class="nav-item login">
                                 <a class="nav-link" href="login.php">Login</a>
                             </li>
                         <?php else: ?>
-
+                            
                             <li class="nav-item logout">
                                 <form action="logout.php" method="POST">
-                                    <button type="submit" class="nav-link btn btn-link"
-                                        onclick="return confirmLogout()">Logout</button>
+                                    <button type="submit" class="nav-link btn btn-link" onclick="return confirmLogout()">Logout</button>
                                 </form>
                             </li>
                         <?php endif; ?>
@@ -291,7 +287,7 @@ $conn->close();
 
     <nav aria-label="breadcrumb" style="padding-top: 5%; margin-left: 20px;">
         <ol class="breadcrumb fade-in">
-            <li class="breadcrumb-item"><a href="swimming_packages.php">Swimming Packages</a></li>
+            <li class="breadcrumb-item"><a href="swimming.php">Swimming Packages</a></li>
             <li class="breadcrumb-item active" aria-current="page"><?php echo $package_name; ?></li>
         </ol>
     </nav>
@@ -320,9 +316,8 @@ $conn->close();
                 <p><strong>Price:</strong> <?php echo $price; ?></p>
                 <p><strong>Duration:</strong> <?php echo $duration; ?></p>
                 <p><strong>Max Pax:</strong> <?php echo $max_pax; ?></p>
-                <form method="POST" action="payment.php">
+                <form method="POST" action="package_details.php">
                     <input type="hidden" name="package_id" value="<?php echo $packageId; ?>">
-                    <input type="hidden" name="package_type" value="<?php echo $package_type; ?>">
                     <div class="mb-3">
                         <label for="start_date" class="form-label">Start Date</label>
                         <input type="date" class="form-control" id="start_date" name="start_date" required>
@@ -335,6 +330,19 @@ $conn->close();
                     <?php endif; ?>
                     <button type="submit" class="btn btn-primary">Reserve Now</button>
                 </form>
+                <?php if (isset($_SESSION['reservation_error'])): ?>
+                    <div class="alert alert-danger mt-3">
+                        <?php
+                        echo $_SESSION['reservation_error'];
+                        unset($_SESSION['reservation_error']);
+                        ?>
+                    </div>
+                <?php elseif (isset($_SESSION['reservation_success']) && $_SESSION['reservation_success']): ?>
+                    <div class="alert alert-success mt-3">
+                        Reservation successful. Your reservation is now pending for admin review.
+                        <?php unset($_SESSION['reservation_success']); ?>
+                    </div>
+                <?php endif; ?>
                 <div class="reserved-dates">
                     <h5>Reserved Dates:</h5>
                     <ul>
