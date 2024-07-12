@@ -11,114 +11,12 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $packageId = htmlspecialchars(mysqli_real_escape_string($conn, $_POST['package_id']));
-    $start_date = htmlspecialchars(mysqli_real_escape_string($conn, $_POST['start_date']));
-    $end_date = isset($_POST['end_date']) ? htmlspecialchars(mysqli_real_escape_string($conn, $_POST['end_date'])) : null;
-
-    // Fetch package type
-    $stmt_type = $conn->prepare("SELECT package_type FROM swimming_packages WHERE id = ?");
-    $stmt_type->bind_param("i", $packageId);
-    $stmt_type->execute();
-    $stmt_type->bind_result($package_type);
-    $stmt_type->fetch();
-    $stmt_type->close();
-
-    // Validate dates based on package type
-    if ($package_type == 'Combo' && empty($end_date)) {
-        $_SESSION['reservation_error'] = "Please select an end date for Combo packages.";
-        header("Location: package_details.php?id=$packageId");
-        exit();
-    }
-
-    // Set end date for "Day" or "Overnight" packages
-    if ($package_type == 'Day' || $package_type == 'Overnight') {
-        $end_date = $start_date; // Assuming end date is the same as start date for these packages
-    }
-
-    $startTimestamp = strtotime($start_date);
-    $endTimestamp = $end_date ? strtotime($end_date) : null;
-
-    // Only validate end date for Combo packages
-    if ($package_type == 'Combo' && $end_date && $endTimestamp <= $startTimestamp) {
-        $_SESSION['reservation_error'] = "End date must be after start date.";
-        header("Location: package_details.php?id=$packageId");
-        exit();
-    }
-
-    // Check for overlapping reservations
-    $overlap = false;
-    if ($package_type == 'Day') {
-        $reservedSql = "SELECT * FROM package_reservations WHERE package_id = ? AND status != 'cancelled' AND 
-                       (start_date = ?)";
-        $stmt_overlap = $conn->prepare($reservedSql);
-        $stmt_overlap->bind_param("is", $packageId, $start_date);
-    } else {
-        $reservedSql = "SELECT * FROM package_reservations WHERE package_id = ? AND status != 'cancelled' AND 
-                       ((start_date <= ? AND end_date >= ?) OR (start_date <= ? AND end_date >= ?) OR (start_date >= ? AND end_date <= ?))";
-        $stmt_overlap = $conn->prepare($reservedSql);
-        $stmt_overlap->bind_param("issssss", $packageId, $start_date, $end_date, $start_date, $end_date, $start_date, $end_date);
-    }
-
-    $stmt_overlap->execute();
-    $stmt_overlap->store_result();
-    if ($stmt_overlap->num_rows > 0) {
-        $overlap = true;
-    }
-    $stmt_overlap->close();
-
-    if ($overlap) {
-        $_SESSION['reservation_error'] = "Selected dates overlap with existing reservations.";
-        header("Location: package_details.php?id=$packageId");
-        exit();
-    }
-
-    // Calculate total price based on package type and add-ons
-    $sql_price = "SELECT price FROM swimming_packages WHERE id = ?";
-    $stmt_price = $conn->prepare($sql_price);
-    $stmt_price->bind_param("i", $packageId);
-    $stmt_price->execute();
-    $stmt_price->bind_result($base_price);
-    $stmt_price->fetch();
-    $stmt_price->close();
-
-    $totalPrice = $base_price;
-
-    if ($package_type == 'Combo') {
-        $totalPrice *= ceil(($endTimestamp - $startTimestamp) / (60 * 60 * 24));
-    }
-
-    $totalPrice += $base_price * 0.05; // Reservation fee
-
-    // Insert reservation with status 'pending'
-    if ($package_type == 'Day') {
-        $insertSql = "INSERT INTO package_reservations (package_id, user_id, start_date, total_price, status) VALUES (?, ?, ?, ?, 'pending')";
-        $stmt_insert = $conn->prepare($insertSql);
-        $stmt_insert->bind_param("iiss", $packageId, $_SESSION['user_id'], $start_date, $totalPrice);
-    } else {
-        $insertSql = "INSERT INTO package_reservations (package_id, user_id, start_date, end_date, total_price, status) VALUES (?, ?, ?, ?, ?, 'pending')";
-        $stmt_insert = $conn->prepare($insertSql);
-        $stmt_insert->bind_param("iisss", $packageId, $_SESSION['user_id'], $start_date, $end_date, $totalPrice);
-    }
-
-    if ($stmt_insert === false) {
-        die('Failed to prepare statement: ' . htmlspecialchars($conn->error));
-    }
-
-    $result = $stmt_insert->execute();
-
-    if ($result) {
-        $_SESSION['reservation_success'] = true;
-    } else {
-        $_SESSION['reservation_success'] = false;
-    }
-
-    header("Location: package_details.php?id=$packageId");
-    exit();
-}
-
 // Fetch package details
-$packageId = htmlspecialchars(mysqli_real_escape_string($conn, $_GET['id']));
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    die('Invalid package ID.');
+}
+$packageId = intval($_GET['id']);
+
 $sql_package = "SELECT package_name, inclusions, price, duration, max_pax, multiple_images, package_type FROM swimming_packages WHERE id = ?";
 $stmt_package = $conn->prepare($sql_package);
 $stmt_package->bind_param("i", $packageId);
@@ -127,11 +25,15 @@ $stmt_package->bind_result($package_name, $inclusions, $price, $duration, $max_p
 $stmt_package->fetch();
 $stmt_package->close();
 
+if (!$package_name) {
+    die('Package not found.');
+}
+
 $packageImages = explode(",", $multiple_images);
 
 // Fetch reserved dates
 $reservedDates = [];
-$sql_reserved = "SELECT start_date, end_date FROM package_reservations WHERE package_id = ? AND status != 'cancelled'";
+$sql_reserved = "SELECT start_date, end_date FROM package_reservations WHERE package_id = ? AND status = 'Accepted'";
 $stmt_reserved = $conn->prepare($sql_reserved);
 $stmt_reserved->bind_param("i", $packageId);
 $stmt_reserved->execute();
@@ -147,6 +49,7 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -154,9 +57,11 @@ $conn->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
     <link href="default.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
-   <style>
+    <style>
         .reserved-dates {
             margin-top: 20px;
         }
@@ -173,7 +78,7 @@ $conn->close();
             padding: 5px 10px;
             border-radius: 5px;
         }
-        
+
         .footer {
             background-color: #343a40;
             color: white;
@@ -234,16 +139,16 @@ $conn->close();
             font-size: 24px;
             cursor: pointer;
         }
-
     </style>
 </head>
+
 <body>
-<nav class="navbar navbar-expand-lg fixed-top">
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-lg">
-        <a class="navbar-brand" href="index.html">
-            <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
-            Board Mart Event Place
-        </a>
+            <a class="navbar-brand" href="index.html">
+                <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
+                Board Mart Event Place
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -251,7 +156,7 @@ $conn->close();
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="mx-auto">
                     <ul class="navbar-nav">
-                    <li class="nav-item">
+                        <li class="nav-item">
                             <a class="nav-link" href="index1.php">Home</a>
                         </li>
                         <li class="nav-item">
@@ -264,18 +169,19 @@ $conn->close();
                             <a class="nav-link" href="profilecopy.php">Profile</a>
                         </li>
                         <?php
-                       
+
                         if (!isset($_SESSION['user_id'])):
-                        ?>
-                         
+                            ?>
+
                             <li class="nav-item login">
                                 <a class="nav-link" href="login.php">Login</a>
                             </li>
                         <?php else: ?>
-                            
+
                             <li class="nav-item logout">
                                 <form action="logout.php" method="POST">
-                                    <button type="submit" class="nav-link btn btn-link" onclick="return confirmLogout()">Logout</button>
+                                    <button type="submit" class="nav-link btn btn-link"
+                                        onclick="return confirmLogout()">Logout</button>
                                 </form>
                             </li>
                         <?php endif; ?>
@@ -311,52 +217,83 @@ $conn->close();
                 </div>
             </div>
             <div class="col-md-6">
-                <h1><?php echo $package_name; ?></h1>
-                <p><?php echo $inclusions; ?></p>
-                <p><strong>Price:</strong> <?php echo $price; ?></p>
-                <p><strong>Duration:</strong> <?php echo $duration; ?></p>
-                <p><strong>Max Pax:</strong> <?php echo $max_pax; ?></p>
-                <form method="POST" action="package_details.php">
+    <h1><?php echo htmlspecialchars($package_name); ?></h1>
+    <p><?php echo htmlspecialchars($inclusions); ?></p>
+    <p><strong>Price:</strong> <?php echo htmlspecialchars($price); ?></p>
+    <p><strong>Duration:</strong> <?php echo htmlspecialchars($duration); ?></p>
+    <p><strong>Max Pax:</strong> <?php echo htmlspecialchars($max_pax); ?></p>
+    <form method="POST" action="showinfo.php">
+
                     <input type="hidden" name="package_id" value="<?php echo $packageId; ?>">
+                    <input type="hidden" name="package_name" value="<?php echo htmlspecialchars($package_name); ?>">
+                    <input type="hidden" name="inclusions" value="<?php echo htmlspecialchars($inclusions); ?>">
+                    <input type="hidden" name="price" value="<?php echo $price; ?>">
+                    <input type="hidden" name="duration" value="<?php echo htmlspecialchars($duration); ?>">
+                    <input type="hidden" name="max_pax" value="<?php echo htmlspecialchars($max_pax); ?>">
+
                     <div class="mb-3">
                         <label for="start_date" class="form-label">Start Date</label>
                         <input type="date" class="form-control" id="start_date" name="start_date" required>
                     </div>
+
                     <?php if ($package_type == 'Combo'): ?>
                         <div class="mb-3">
                             <label for="end_date" class="form-label">End Date</label>
                             <input type="date" class="form-control" id="end_date" name="end_date" required>
                         </div>
                     <?php endif; ?>
-                    <button type="submit" class="btn btn-primary">Reserve Now</button>
+
+                    <!-- Add-ons section -->
+                    <div class="mb-3">
+                        <label class="form-label">Add-ons</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="extendedStay" name="add_ons[]"
+                                value="Extended stay" onchange="calculateTotalPrice()">
+                            <label class="form-check-label" for="extendedStay">Extended stay (₱1,000 per hour)</label>
+                            <input type="number" id="extendedStayHours" name="extended_stay_hours"
+                                class="form-control mt-2" min="0" value="0" onchange="calculateTotalPrice()">
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="familyRoom" name="add_ons[]"
+                                value="Family Room" onchange="calculateTotalPrice()">
+                            <label class="form-check-label" for="familyRoom">Family Room (₱3,000)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="suiteRoom" name="add_ons[]"
+                                value="Suite Room" onchange="calculateTotalPrice()">
+                            <label class="form-check-label" for="suiteRoom">Suite Room (₱5,000)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="videokeGameRoom" name="add_ons[]"
+                                value="Videoke and Game Room" onchange="calculateTotalPrice()">
+                            <label class="form-check-label" for="videokeGameRoom">Videoke and Game Room (₱3,000)</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <p><strong>Reservation Fee:</strong> 5000</p>
+                        <label for="totalPrice" class="form-label">Total Price</label>
+                        <input type="text" id="totalPrice" class="form-control" readonly>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Pay Now</button>
                 </form>
-                <?php if (isset($_SESSION['reservation_error'])): ?>
-                    <div class="alert alert-danger mt-3">
-                        <?php
-                        echo $_SESSION['reservation_error'];
-                        unset($_SESSION['reservation_error']);
-                        ?>
-                    </div>
-                <?php elseif (isset($_SESSION['reservation_success']) && $_SESSION['reservation_success']): ?>
-                    <div class="alert alert-success mt-3">
-                        Reservation successful. Your reservation is now pending for admin review.
-                        <?php unset($_SESSION['reservation_success']); ?>
-                    </div>
-                <?php endif; ?>
-                <div class="reserved-dates">
-                    <h5>Reserved Dates:</h5>
-                    <ul>
-                        <?php foreach ($reservedDates as $dateRange): ?>
-                            <li>
-                                <?php echo $dateRange['start_date']; ?>
-                                <?php if ($dateRange['end_date']): ?>
-                                    - <?php echo $dateRange['end_date']; ?>
-                                <?php endif; ?>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            </div>
+    
+    <div class="reserved-dates">
+        <h5>Reserved Dates:</h5>
+        <ul>
+            <?php foreach ($reservedDates as $dateRange): ?>
+                <li>
+                    <?php echo htmlspecialchars($dateRange['start_date']); ?>
+                    <?php if ($dateRange['end_date']): ?>
+                        - <?php echo htmlspecialchars($dateRange['end_date']); ?>
+                    <?php endif; ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+</div>
+
         </div>
     </div>
 
@@ -396,6 +333,66 @@ $conn->close();
         <?php endforeach; ?>
         <span class="close-btn" onclick="closeImageViewer()">&times;</span>
     </div>
+    <script>
+        document.getElementById('add_on1').addEventListener('change', function() {
+            var extendedStayHoursInput = document.getElementById('extended_stay_hours');
+            if (this.checked) {
+                extendedStayHoursInput.setAttribute('required', 'required');
+            } else {
+                extendedStayHoursInput.removeAttribute('required');
+            }
+        });
+    </script>
+   
+   <script>
+    function calculateTotalPrice() {
+        let basePrice = <?php echo $price; ?>;
+        let reservationFee = 5000;
+        let totalPrice = basePrice;
+
+        <?php if ($package_type == 'Combo'): ?>
+            let startDate = new Date(document.getElementById('start_date').value);
+            let endDate = new Date(document.getElementById('end_date').value);
+            let days = (endDate - startDate) / (1000 * 60 * 60 * 24);
+            totalPrice *= Math.ceil(days);
+        <?php endif; ?>
+
+        let extendedStayChecked = document.getElementById('extendedStay').checked;
+        if (extendedStayChecked) {
+            let extendedStayHours = parseInt(document.getElementById('extendedStayHours').value, 10);
+            totalPrice += 1000 * extendedStayHours;
+        }
+
+        let familyRoomChecked = document.getElementById('familyRoom').checked;
+        if (familyRoomChecked) {
+            totalPrice += 3000;
+        }
+
+        let suiteRoomChecked = document.getElementById('suiteRoom').checked;
+        if (suiteRoomChecked) {
+            totalPrice += 5000;
+        }
+
+        let videokeGameRoomChecked = document.getElementById('videokeGameRoom').checked;
+        if (videokeGameRoomChecked) {
+            totalPrice += 3000;
+        }
+
+        totalPrice += reservationFee;
+
+        document.getElementById('totalPrice').value = '₱' + totalPrice.toLocaleString();
+    }
+
+    // Event listeners for date inputs
+    document.getElementById('start_date').addEventListener('change', calculateTotalPrice);
+    document.getElementById('end_date').addEventListener('change', calculateTotalPrice);
+
+    // Initial calculation on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        calculateTotalPrice();
+    });
+</script>
+
 
     <script>
         document.getElementById('showMoreBtn').addEventListener('click', function () {
