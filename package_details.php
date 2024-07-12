@@ -62,6 +62,10 @@ $conn->close();
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
     <style>
+        .readonly-input {
+        background-color: #f8f9fa; /* Light gray background */
+        cursor: not-allowed; /* Show disabled cursor */
+    }
         .reserved-dates {
             margin-top: 20px;
         }
@@ -217,12 +221,12 @@ $conn->close();
                 </div>
             </div>
             <div class="col-md-6">
-    <h1><?php echo htmlspecialchars($package_name); ?></h1>
-    <p><?php echo htmlspecialchars($inclusions); ?></p>
-    <p><strong>Price:</strong> <?php echo htmlspecialchars($price); ?></p>
-    <p><strong>Duration:</strong> <?php echo htmlspecialchars($duration); ?></p>
-    <p><strong>Max Pax:</strong> <?php echo htmlspecialchars($max_pax); ?></p>
-    <form method="POST" action="showinfo.php">
+                <h1><?php echo htmlspecialchars($package_name); ?></h1>
+                <p><?php echo htmlspecialchars($inclusions); ?></p>
+                <p><strong>Price:</strong> <?php echo htmlspecialchars($price); ?></p>
+                <p><strong>Duration:</strong> <?php echo htmlspecialchars($duration); ?></p>
+                <p><strong>Max Pax:</strong> <?php echo htmlspecialchars($max_pax); ?></p>
+                <form method="POST" action="showinfo.php">
 
                     <input type="hidden" name="package_id" value="<?php echo $packageId; ?>">
                     <input type="hidden" name="package_name" value="<?php echo htmlspecialchars($package_name); ?>">
@@ -278,21 +282,21 @@ $conn->close();
 
                     <button type="submit" class="btn btn-primary">Pay Now</button>
                 </form>
-    
-    <div class="reserved-dates">
-        <h5>Reserved Dates:</h5>
-        <ul>
-            <?php foreach ($reservedDates as $dateRange): ?>
-                <li>
-                    <?php echo htmlspecialchars($dateRange['start_date']); ?>
-                    <?php if ($dateRange['end_date']): ?>
-                        - <?php echo htmlspecialchars($dateRange['end_date']); ?>
-                    <?php endif; ?>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    </div>
-</div>
+
+                <div class="reserved-dates">
+                    <h5>Reserved Dates:</h5>
+                    <ul>
+                        <?php foreach ($reservedDates as $dateRange): ?>
+                            <li>
+                                <?php echo htmlspecialchars($dateRange['start_date']); ?>
+                                <?php if ($dateRange['end_date']): ?>
+                                    - <?php echo htmlspecialchars($dateRange['end_date']); ?>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </div>
 
         </div>
     </div>
@@ -334,7 +338,7 @@ $conn->close();
         <span class="close-btn" onclick="closeImageViewer()">&times;</span>
     </div>
     <script>
-        document.getElementById('add_on1').addEventListener('change', function() {
+        document.getElementById('add_on1').addEventListener('change', function () {
             var extendedStayHoursInput = document.getElementById('extended_stay_hours');
             if (this.checked) {
                 extendedStayHoursInput.setAttribute('required', 'required');
@@ -343,56 +347,109 @@ $conn->close();
             }
         });
     </script>
-   
-   <script>
-    function calculateTotalPrice() {
-        let basePrice = <?php echo $price; ?>;
-        let reservationFee = 5000;
-        let totalPrice = basePrice;
 
-        <?php if ($package_type == 'Combo'): ?>
-            let startDate = new Date(document.getElementById('start_date').value);
-            let endDate = new Date(document.getElementById('end_date').value);
-            let days = (endDate - startDate) / (1000 * 60 * 60 * 24);
-            totalPrice *= Math.ceil(days);
-        <?php endif; ?>
+    <script>
+        function calculateTotalPrice() {
+            let basePrice = <?php echo $price; ?>;
+            let reservationFee = 5000;
+            let totalPrice = basePrice;
 
-        let extendedStayChecked = document.getElementById('extendedStay').checked;
-        if (extendedStayChecked) {
-            let extendedStayHours = parseInt(document.getElementById('extendedStayHours').value, 10);
-            totalPrice += 1000 * extendedStayHours;
+            <?php if ($package_type == 'Combo'): ?>
+                let startDate = new Date(document.getElementById('start_date').value);
+                let endDate = new Date(document.getElementById('end_date').value);
+                let days = (endDate - startDate) / (1000 * 60 * 60 * 24);
+                totalPrice *= Math.ceil(days);
+            <?php endif; ?>
+
+            let extendedStayChecked = document.getElementById('extendedStay').checked;
+            if (extendedStayChecked) {
+                let extendedStayHours = parseInt(document.getElementById('extendedStayHours').value, 10);
+                totalPrice += 1000 * extendedStayHours;
+            }
+
+            let familyRoomChecked = document.getElementById('familyRoom').checked;
+            if (familyRoomChecked) {
+                totalPrice += 3000;
+            }
+
+            let suiteRoomChecked = document.getElementById('suiteRoom').checked;
+            if (suiteRoomChecked) {
+                totalPrice += 5000;
+            }
+
+            let videokeGameRoomChecked = document.getElementById('videokeGameRoom').checked;
+            if (videokeGameRoomChecked) {
+                totalPrice += 3000;
+            }
+
+            totalPrice += reservationFee;
+
+            document.getElementById('totalPrice').value = '₱' + totalPrice.toLocaleString();
         }
 
-        let familyRoomChecked = document.getElementById('familyRoom').checked;
-        if (familyRoomChecked) {
-            totalPrice += 3000;
-        }
+        // Event listeners for date inputs
+        document.getElementById('start_date').addEventListener('change', calculateTotalPrice);
+        document.getElementById('end_date').addEventListener('change', calculateTotalPrice);
 
-        let suiteRoomChecked = document.getElementById('suiteRoom').checked;
-        if (suiteRoomChecked) {
-            totalPrice += 5000;
-        }
+        // Initial calculation on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            calculateTotalPrice();
+        });
+    </script>
 
-        let videokeGameRoomChecked = document.getElementById('videokeGameRoom').checked;
-        if (videokeGameRoomChecked) {
-            totalPrice += 3000;
-        }
+<div class="mb-3">
+    <label for="start_date" class="form-label">Start Date</label>
+    <input type="date" class="form-control" id="start_date" name="start_date" required>
+</div>
 
-        totalPrice += reservationFee;
-
-        document.getElementById('totalPrice').value = '₱' + totalPrice.toLocaleString();
-    }
-
-    // Event listeners for date inputs
-    document.getElementById('start_date').addEventListener('change', calculateTotalPrice);
-    document.getElementById('end_date').addEventListener('change', calculateTotalPrice);
-
-    // Initial calculation on page load
+<?php if ($package_type == 'Combo'): ?>
+    <div class="mb-3">
+        <label for="end_date" class="form-label">End Date</label>
+        <input type="date" class="form-control" id="end_date" name="end_date" required disabled>
+    </div>
+<?php endif; ?>
+<script>
     document.addEventListener('DOMContentLoaded', function() {
-        calculateTotalPrice();
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+
+        // Function to enable/disable end date based on start date selection
+        function toggleEndDate() {
+            if (startDateInput.value) {
+                endDateInput.disabled = false; // Enable end date input
+                endDateInput.min = startDateInput.value; // Set minimum date for end date
+            } else {
+                endDateInput.disabled = true; // Disable end date input
+                endDateInput.value = ''; // Reset end date value
+            }
+        }
+
+        // Event listener on start date input
+        startDateInput.addEventListener('change', function() {
+            toggleEndDate();
+        });
+
+        // Event listener on end date input to prevent selecting a date before start date
+        endDateInput.addEventListener('change', function() {
+            if (endDateInput.value < startDateInput.value) {
+                endDateInput.value = startDateInput.value;
+            }
+        });
+
+        // Ensure start date cannot be a past date
+        const today = new Date().toISOString().split('T')[0];
+        startDateInput.setAttribute('min', today);
+
+        // Additional event listener to clear end date if start date changes
+        startDateInput.addEventListener('input', function() {
+            endDateInput.value = ''; // Clear end date value
+            toggleEndDate(); // Update end date input state
+        });
+
+        // Initial setup based on start date value
+        toggleEndDate();
     });
 </script>
-
 
     <script>
         document.getElementById('showMoreBtn').addEventListener('click', function () {
