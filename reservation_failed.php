@@ -7,6 +7,8 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Get error message if it exists
+$error_message = isset($_SESSION['reservation_error']) ? $_SESSION['reservation_error'] : 'An unknown error occurred. Please try again later.';
 ?>
 
 <!DOCTYPE html>
@@ -15,7 +17,7 @@ if (!isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservation Success</title>
+    <title>Reservation Failed</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
     <link href="default.css" rel="stylesheet">
@@ -60,12 +62,17 @@ if (!isset($_SESSION['user_id'])) {
 <?php include 'user_navbar.php'; ?>
     <div class="container">
         <div class="card" style="margin-bottom:10%;">
-            <h1 class="card-title">Reservation Successful!</h1>
-            <p class="card-text">Thank you for making a reservation with us.</p>
-            <a href="index1.php" class="btn btn-lg btn-primary btn-back">Back to Home</a>
+            <h1 class="card-title">Reservation Failed</h1>
+            <p class="card-text"><?php echo $error_message; ?></p>
+            <a href="swimming_packages.php" class="btn btn-lg btn-primary btn-back">Back to Package</a>
         </div>
     </div>
     <?php include 'footer.php'; ?>
 </body>
 
 </html>
+
+<?php
+// Clear the error message after displaying it
+unset($_SESSION['reservation_error']);
+?>

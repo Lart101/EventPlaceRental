@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Destination</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/6.4.15/swiper-bundle.min.css">
+  <style>
+    body {
+      background-size: cover;
+      background: url(bgmart.jpg);
+      backdrop-filter: blur(6px); /* Adjust the blur amount as needed */
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+
+
+  
+    section {
+      display: grid;
+      grid-template-columns: 50% 45%;
+      place-items: center;
+      gap: 60px;
+      min-height: 95vh;
+      padding: 20px 60px;
+      
+    }
+
+    /* CONTENT */
+
+    .content {
+      max-width: 2300px;
+    }
+
+    .content h1 {
+      font-family: 'Century Gothic Regular', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: 1px;
+      margin-bottom: 36px;
+      color: #fff;
+    }
+
+    .content p {
+      font-size: clamp(1rem, 4vw, 1.1rem);
+      font-weight: 300;
+      line-height: 1.5;
+      margin-bottom: 40px;
+      color: #fff;
+      font-family: 'Century Gothic Regular', sans-serif;
+    }
+
+    .content button {
+      background: #eaeaea;
+      color: #202134;
+      font-size: clamp(0.9rem, 4vw, 1rem);
+      font-weight: 600;
+      border: 0;
+      outline: 0;
+      padding: 8px 14px;
+      border-radius: 7px;
+      transform: scale(1);
+      transition: all 0.4s ease-in;
+      cursor: pointer;
+    }
+
+    .content button:hover, .content button:focus {
+      transform: scale(0.98);
+      background-color: #6f7aa6;
+      color: #eaeaea;
+    }
+
+    /* SLIDER */
+
+    .swiper {
+      position: relative;
+      width: 400px;
+      height: 490px;
+    }
+
+    .swiper-slide {
+      position: relative;
+      background-position: center;
+      background-size: cover;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      user-select: none;
+      border-radius: 20px;
+    }
+
+    .cost {
+      position: absolute;
+      top: 8px;
+      right: 6px;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+      border-radius: 30px;
+      padding: 6px 10px;
+      color: #fff;
+      font-size: clamp(0.8rem, 4vw, 0.9rem);
+      font-weight: 600;
+      font-family: 'Century Gothic Regular', sans-serif;
+    }
+
+    .dark-text {
+      color: #202134;
+    }
+
+    .swiper-slide img {
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+    }
+
+    .overlay {
+      position: absolute;
+      display: flex;
+      font-family: 'Century Gothic Regular', sans-serif;
+      flex-direction: column;
+      justify-content: center;
+      left: 0;
+      bottom: 0;
+      width: 360px;
+      height: 150px;
+      padding: 10px 20px;
+      background: rgba(93, 95, 145, 0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .overlay h1 {
+      font-size: clamp(1.2rem, 3vw, 1.2rem);
+      font-weight: 400;
+      font-family: 'Century Gothic Regular', sans-serif;
+    }
+
+    .overlay p {
+      font-size: clamp(0.6rem, 4vw, 0.8rem);
+      font-weight: 200;
+      line-height: 1.2;
+      margin-bottom: 30px;
+      font-family: 'Century Gothic Regular', sans-serif;
+    }
+
+    .ratings {
+      display: flex;
+      column-gap: 10px;
+      margin-top: -6px;
+    }
+
+    .ratings span {
+      font-size: clamp(0.8rem, 4vw, 0.9rem);
+      font-weight: 300;
+    }
+
+    .star {
+      color: #afe312;
+    }
+
+    @media (max-width: 920px) {
+      .swiper {
+        width: 350px;
+        height: 450px;
+      }
+    }
+
+    @media (max-width: 920px) {
+      section {
+        grid-template-columns: 100%;
+        grid-template-rows: 55% 40%;
+        grid-template-areas:
+          "slider"
+          "content";
+        place-items: center;
+        gap: 64px;
+        padding: 60px;
+      }
+
+      .swiper {
+        grid-area: slider;
+      }
+
+      .content {
+        grid-area: content;
+        text-align: center;
+      }
+
+      .content h1 {
+        margin-bottom: 30px;
+      }
+    }
+
+    @media (max-width: 470px) {
+      section {
+        padding: 40px 40px 60px;
+      }
+
+      .swiper {
+        width: 300px;
+        height: 400px;
+      }
+    }
+    .social {
+      position: absolute;
+      z-index: 1;
+      bottom: 40px;
+      left: 30px; /* Adjusted to bottom left */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .social li {
+      list-style: none;
+    }
+
+    .social li a {
+      display: inline-block;
+      margin-right: 25px;
+      filter: invert(1);
+      transform: scale(0.5);
+      transition: 0.5s;
+    }
+
+    .social li a:hover {
+      transform: scale(0.5) translateY(-15px);
+    }
+    .card__btn {
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 24px;
+      font-family: 'Century Gothic Regular', sans-serif;
+      font-size: 14px;
+      text-align: center;
+      text-decoration: none;
+      text-transform: uppercase;
+      width: 150px;
+      margin-top: 16px;
+      opacity: 0.7;
+      padding: 12px;
+      transition: 0.3s ease;
+    }
+    .card__btn:hover {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="tsparticles"></div>
+  <section>
+    <div class="content">
+      <h1>Welcome to Board Mart's Event Place!</h1>
+      <p>
+        Discover our versatile swimming packages, perfect for any group size. Enjoy private pool access, function halls, a videoke machine, board games, and more. Located in Arkong Bato, Valenzuela City. Book your memorable event today!
+      </p>
+      <a href="index1.php" class="card__btn">Discover More</a>
+    </div>
+
+    <div class="swiper">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <img src="slide1.jpg" />
+          <div class="cost">96% recommend (37 reviews)</div>
+          <div class="overlay">
+            <h1>Swimming Packages at BoardMart's Event Place</h1>
+            <p>
+              Discover our versatile swimming packages, perfect for any group size. Enjoy private pool access, function halls, a videoke machine, board games, and more. Located at 1043 Mendoza St., Arkong Bato, Valenzuela City, Philippines.
+            </p>
+            <div class="ratings">
+              <div class="stars">
+                <ion-icon class="star" name="star"></ion-icon>
+                <ion-icon class="star" name="star"></ion-icon>
+                <ion-icon class="star" name="star"></ion-icon>
+                <ion-icon class="star" name="star"></ion-icon>
+                <ion-icon class="star" name="star-half-outline"></ion-icon>
+              </div>
+         
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <img src="slide2.jpg" />
+          <div class="cost">96% recommend (37 reviews)</div>
+          <div class="overlay">
+            <h1>Ideal for Special Occasions</h1>
+            <p>
+              BoardMart's Event Place offers venue for special occasions at affordable rates. It includes outdoor event venues, private swimming pool, videoke, games and activity area, and room accommodations. Located at 1043 Mendoza St., Arkong Bato, Valenzuela City, Philippines.
+            </p>
+            <div class="ratings">
+              <div class="stars">
+                <ion-icon class="star" name="star"></ion-icon>
+                <ion-icon class="star" name="star"></ion-icon>
+                <ion-icon class="star"></ion-icon>
+                <ion-icon class="star"></ion-icon>
+                <ion-icon class="star"></ion-icon>
+              </div>
+           
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <img src="slide3.jpg" />
+          <div class="cost">96% recommend (37 reviews)</div>
+          <div class="overlay">
+            <h1>Discover BoardMart's Event Place</h1>
+            <p>
+              Explore the facilities at BoardMart's Event Place, including outdoor event venues, private swimming pool, videoke, games and activity area, and room accommodations. Located at 1043 Mendoza St., Arkong Bato, Valenzuela City, Philippines.
+            </p>
+            <div class="ratings">
+              <div class="stars">
+                <ion-icon class="star" name="star"></ion-icon>
+                <ion-icon class="star" name="star"></ion-icon>
+                <ion-icon class="star"></ion-icon>
+                <ion-icon class="star"></ion-icon>
+                <ion-icon class="star"></ion-icon>
+              </div>
+             
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <img src="slide4.jpg" />
+          <div class="cost">96% recommend (37 reviews)</div>
+          <div class="overlay">
+            <h1>Enjoy BoardMart's Event Place</h1>
+            <p>
+              Experience the amenities at BoardMart's Event Place, offering outdoor event venues, private swimming pool, videoke, games and activity area, and room accommodations. Located at 1043 Mendoza St., Arkong Bato, Valenzuela City, Philippines.
+            </p>
+            <div class="ratings">
+              <div class="stars">
+                <ion-icon class="star" name="star"></ion-icon>
+                <ion-icon class="star"></ion-icon>
+                <ion-icon class="star"></ion-icon>
+                <ion-icon class="star"></ion-icon>
+                <ion-icon class="star"></ion-icon>
+              </div>
+        
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul class="social">
+      <li><a href="https://www.facebook.com/BoardMartsEventPlace"><img src="https://i.ibb.co/x7P24fL/facebook.png"></a></li>
+      <li><a href="https://x.com/Boardmart"><img src="https://i.ibb.co/Wnxq2Nq/twitter.png"></a></li>
+      <li><a href="https://www.instagram.com/boardmarseventplace"><img src="https://i.ibb.co/ySwtH4B/instagram.png"></a></li>
+    </ul>
+  </section>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/6.4.15/swiper-bundle.min.js"></script>
+  <script>
+    var swiper = new Swiper(".swiper", {
+      effect: "cube",
+      grabCursor: true,
+      loop: true,
+      speed: 1000,
+      cubeEffect: {
+        shadow: false,
+        slideShadows: true,
+        shadowOffset: 10,
+        shadowScale: 0.94,
+      },
+      autoplay: {
+        delay: 2600,
+        pauseOnMouseEnter: true,
+      },
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tsparticles/particles@1.30.3"></script>
+  <script>
+    tsParticles.load("tsparticles", {
+      fpsLimit: 60,
+      backgroundMode: {
+        enable: true,
+        zIndex: -1,
+      },
+      particles: {
+        number: {
+          value: 30,
+          density: {
+            enable: true,
+            area: 800,
+          },
+        },
+        color: {
+          value: [
+            "#3998D0",
+            "#2EB6AF",
+            "#A9BD33",
+            "#FEC73B",
+            "#F89930",
+            "#F45623",
+            "#D62E32",
+          ],
+        },
+        destroy: {
+          mode: "split",
+          split: {
+            count: 1,
+            factor: {
+              value: 5,
+              random: {
+                enable: true,
+                minimumValue: 4,
+              },
+            },
+            rate: {
+              value: 10,
+              random: {
+                enable: true,
+                minimumValue: 5,
+              },
+            },
+            particles: {
+              collisions: {
+                enable: false,
+              },
+              destroy: {
+                mode: "none",
+              },
+              life: {
+                count: 1,
+                duration: {
+                  value: 1,
+                },
+              },
+            },
+          },
+        },
+        shape: {
+          type: "circle",
+          stroke: {
+            width: 0,
+            color: "#000000",
+          },
+          polygon: {
+            sides: 5,
+          },
+        },
+        opacity: {
+          value: 1,
+          random: false,
+          animation: {
+            enable: false,
+            speed: 1,
+            minimumValue: 0.1,
+            sync: false,
+          },
+        },
+        size: {
+          value: 8,
+          random: {
+            enable: true,
+            minimumValue: 4,
+          },
+          animation: {
+            enable: false,
+            speed: 40,
+            minimumValue: 0.1,
+            sync: false,
+          },
+        },
+        collisions: {
+          enable: true,
+          mode: "destroy",
+        },
+        move: {
+          enable: true,
+          speed: 7,
+          direction: "none",
+          random: false,
+          straight: false,
+          out_mode: "out",
+          attract: {
+            enable: false,
+            rotateX: 600,
+            rotateY: 1200,
+          },
+        },
+      },
+      detectRetina: true,
+    });
+  </script>
+</body>
+</html>
+

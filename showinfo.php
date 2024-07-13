@@ -49,6 +49,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header('Location: index.php');
     exit();
 }
+if (!empty($errorMsg)): ?>
+    <div class="alert alert-danger">
+        <?php echo htmlspecialchars($errorMsg); ?>
+    </div>
+<?php endif;
 ?>
 <!DOCTYPE html>
 <html lang="en">

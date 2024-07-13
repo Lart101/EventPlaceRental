@@ -43,32 +43,6 @@ while ($stmt_reserved->fetch()) {
 }
 
 $stmt_reserved->close();
-function isDateReserved($conn, $packageId, $startDate) {
-    $sql = "SELECT COUNT(*) as count FROM package_reservations 
-            WHERE package_id = ? 
-            AND start_date = ? 
-            AND status = 'Accepted'";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("is", $packageId, $startDate);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-    return $row['count'] > 0;
-}
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $packageId = $_POST['package_id'];
-    $startDate = $_POST['start_date'];
-    
-    if (isDateReserved($conn, $packageId, $startDate)) {
-        echo "The selected start date is already reserved. Please choose a different date.";
-    } 
-}
-if (!empty($errorMsg)): ?>
-    <div class="alert alert-danger">
-        <?php echo htmlspecialchars($errorMsg); ?>
-    </div>
-<?php endif;
 
 $conn->close();
 ?>
@@ -90,12 +64,9 @@ $conn->close();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
     <style>
         .readonly-input {
-            background-color: #f8f9fa;
-            /* Light gray background */
-            cursor: not-allowed;
-            /* Show disabled cursor */
-        }
-
+        background-color: #f8f9fa; /* Light gray background */
+        cursor: not-allowed; /* Show disabled cursor */
+    }
         .reserved-dates {
             margin-top: 20px;
         }
@@ -112,7 +83,6 @@ $conn->close();
             padding: 5px 10px;
             border-radius: 5px;
         }
-
         .image-collage {
             display: flex;
             flex-wrap: wrap;
@@ -161,14 +131,14 @@ $conn->close();
 </head>
 
 <body>
-    <?php include 'user_navbar.php'; ?>
+<?php include 'user_navbar.php'; ?>
     <script>
+    
 
-
-        function confirmLogout() {
-            return confirm('Are you sure you want to logout?');
-        }
-    </script>
+    function confirmLogout() {
+        return confirm('Are you sure you want to logout?');
+    }
+</script>
     <nav aria-label="breadcrumb" style="padding-top: 5%; margin-left: 20px;">
         <ol class="breadcrumb fade-in">
             <li class="breadcrumb-item"><a href="swimming.php">Swimming Packages</a></li>
@@ -225,12 +195,10 @@ $conn->close();
                     <div class="mb-3">
                         <label class="form-label">Add-ons</label>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="extendedStay" name="add_ons[]"
-                                value="Extended stay" onchange="toggleExtendedStayHours()">
-                            <label class="form-check-label" for="extendedStay">Extended stay (₱1,000 per hour)</label>
-                            <input type="number" id="extendedStayHours" name="extended_stay_hours"
-                                class="form-control mt-2" min="0" max="2" onchange="calculateTotalPrice()">
-                        </div>
+    <input class="form-check-input" type="checkbox" id="extendedStay" name="add_ons[]" value="Extended stay" onchange="toggleExtendedStayHours()">
+    <label class="form-check-label" for="extendedStay">Extended stay (₱1,000 per hour)</label>
+    <input type="number" id="extendedStayHours" name="extended_stay_hours" class="form-control mt-2" min="0" max="2" onchange="calculateTotalPrice()">
+</div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="familyRoom" name="add_ons[]"
                                 value="Family Room" onchange="calculateTotalPrice()">
@@ -343,69 +311,94 @@ $conn->close();
     </script>
 
 
-
-    <script>
-        function toggleExtendedStayHours() {
-            const extendedStayCheckbox = document.getElementById('extendedStay');
-            const extendedStayHours = document.getElementById('extendedStayHours');
-
-            if (extendedStayCheckbox.checked) {
-                extendedStayHours.required = true;
-            } else {
-                extendedStayHours.required = false;
-                extendedStayHours.value = ''; // Clear the input if the checkbox is unchecked
-            }
-            calculateTotalPrice();
-        }
-    </script>
-    <script>
+<?php if ($package_type == 'Combo'): ?>
+    <div class="mb-3">
+        <label for="end_date" class="form-label">End Date</label>
+        <input type="date" class="form-control" id="end_date" name="end_date" required disabled>
+    </div>
+<?php endif; ?>
+<script>
+function toggleExtendedStayHours() {
+    const extendedStayCheckbox = document.getElementById('extendedStay');
+    const extendedStayHours = document.getElementById('extendedStayHours');
+    
+    if (extendedStayCheckbox.checked) {
+        extendedStayHours.required = true;
+    } else {
+        extendedStayHours.required = false;
+        extendedStayHours.value = ''; // Clear the input if the checkbox is unchecked
+    }
+    calculateTotalPrice();
+}
+</script>
+<script>
         const startDateInput = document.getElementById('start_date');
         const today = new Date().toISOString().split('T')[0];
         startDateInput.setAttribute('min', today);
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const startDateInput = document.getElementById('start_date');
-            const endDateInput = document.getElementById('end_date');
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
 
-            // Function to enable/disable end date based on start date selection
-            function toggleEndDate() {
-                if (startDateInput.value) {
-                    endDateInput.disabled = false; // Enable end date input
-                    endDateInput.min = startDateInput.value; // Set minimum date for end date
-                } else {
-                    endDateInput.disabled = true; // Disable end date input
-                    endDateInput.value = ''; // Reset end date value
-                }
+        // Function to enable/disable end date based on start date selection
+        function toggleEndDate() {
+            if (startDateInput.value) {
+                endDateInput.disabled = false; // Enable end date input
+                endDateInput.min = startDateInput.value; // Set minimum date for end date
+            } else {
+                endDateInput.disabled = true; // Disable end date input
+                endDateInput.value = ''; // Reset end date value
             }
+        }
 
-            // Event listener on start date input
-            startDateInput.addEventListener('change', function () {
-                toggleEndDate();
-            });
-
-            // Event listener on end date input to prevent selecting a date before start date
-            endDateInput.addEventListener('change', function () {
-                if (endDateInput.value < startDateInput.value) {
-                    endDateInput.value = startDateInput.value;
-                }
-            });
-
-            // Ensure start date cannot be a past date
-            const today = new Date().toISOString().split('T')[0];
-            startDateInput.setAttribute('min', today);
-
-            // Additional event listener to clear end date if start date changes
-            startDateInput.addEventListener('input', function () {
-                endDateInput.value = ''; // Clear end date value
-                toggleEndDate(); // Update end date input state
-            });
-
-            // Initial setup based on start date value
+        // Event listener on start date input
+        startDateInput.addEventListener('change', function() {
             toggleEndDate();
         });
-    </script>
-   
+
+        // Event listener on end date input to prevent selecting a date before start date
+        endDateInput.addEventListener('change', function() {
+            if (endDateInput.value < startDateInput.value) {
+                endDateInput.value = startDateInput.value;
+            }
+        });
+
+        // Ensure start date cannot be a past date
+        const today = new Date().toISOString().split('T')[0];
+        startDateInput.setAttribute('min', today);
+
+        // Additional event listener to clear end date if start date changes
+        startDateInput.addEventListener('input', function() {
+            endDateInput.value = ''; // Clear end date value
+            toggleEndDate(); // Update end date input state
+        });
+
+        // Initial setup based on start date value
+        toggleEndDate();
+    });
+</script>
+<script>
+    function checkReservation() {
+        const startDate = document.getElementById('start_date').value;
+
+        // Convert startDate to yyyy-mm-dd format to match PHP date format
+        const selectedDate = new Date(startDate).toISOString().split('T')[0];
+
+        // Loop through reserved dates fetched from PHP
+        <?php foreach ($reservedDates as $dateRange): ?>
+            const reservedStartDate = '<?php echo $dateRange['start_date']; ?>';
+
+            // Check if selected date matches any reserved start date
+            if (selectedDate === reservedStartDate) {
+                alert('Start date is already reserved with status "Accepted". Please choose another date.');
+                return false; // Prevent form submission
+            }
+        <?php endforeach; ?>
+
+        return true; // Allow form submission if no match found
+    }
+</script>
 
 
     <script>
