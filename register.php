@@ -37,12 +37,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $now = new DateTime();
     $age = $now->diff($dob)->y;
 
-    
+
     if ($age < 18) {
         $message = "You must be at least 18 years old to register.";
         $error = true;
     } else {
-    
+
         $check_username_stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
         $check_username_stmt->bind_param("s", $username);
         $check_username_stmt->execute();
@@ -53,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = true;
         }
 
-        
+
         $check_email_stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
         $check_email_stmt->bind_param("s", $email);
         $check_email_stmt->execute();
@@ -135,42 +135,42 @@ $conn->close();
             display: inline-block;
             margin-right: 20px;
         }
+
         /* Modal styling */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
-}
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+        }
 
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-}
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
 
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
 
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -266,34 +266,55 @@ $conn->close();
                     </div>
                 </fieldset>
                 <label>
-                <label>
-    <input type="checkbox" id="terms" name="terms" required>
-    I agree to the <a href="#" id="termsLink">Terms and Conditions</a>
-</label>
-<span id="termsError" class="error-message"></span>
+                    <label>
+                        <input type="checkbox" id="terms" name="terms" required>
+                        I agree to the <a href="#" id="termsLink">Terms and Conditions</a>
+                    </label>
+                    <span id="termsError" class="error-message"></span>
 
-<!-- Modal -->
-<div id="termsModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Terms and Conditions</h2>
-        <h3>Privacy Rights</h3>
-        <p>Your privacy is important to us. This section outlines the privacy rights of our users.</p>
-        <p><strong>Collection of Information:</strong> We collect information you provide directly to us when you create an account, update your profile, participate in interactive features of our services, request customer support, or otherwise communicate with us. This information may include your name, email address, phone number, date of birth, gender, and any other information you choose to provide.</p>
-        <p><strong>Use of Information:</strong> We use the information we collect to provide, maintain, and improve our services, such as processing transactions, sending you technical notices, updates, security alerts, and support and administrative messages.</p>
-        <p><strong>Sharing of Information:</strong> We do not share your personal information with third parties except as necessary to provide our services or as required by law. This may include sharing information with service providers who perform services on our behalf, such as payment processing, data analysis, email delivery, hosting services, and customer service.</p>
-        <p><strong>Security:</strong> We take reasonable measures to help protect information about you from loss, theft, misuse, and unauthorized access, disclosure, alteration, and destruction.</p>
-        <p><strong>Your Rights:</strong> You have the right to access, update, correct, or delete your personal information. You can do this by logging into your account or by contacting us directly.</p>
-        <p><strong>Changes to this Policy:</strong> We may change this Privacy Policy from time to time. If we make changes, we will notify you by revising the date at the top of the policy and, in some cases, we may provide you with additional notice (such as adding a statement to our homepage or sending you a notification).</p>
-        <p>By using our services, you agree to the collection and use of your information in accordance with this Privacy Policy. If you have any questions about this policy, please contact us.</p>
-    </div>
-</div>
-                <div class="buttons">
-                    <button type="submit">Register</button>
-                </div>
-                
+                    <!-- Modal -->
+                    <div id="termsModal" class="modal">
+                        <div class="modal-content">
+                            <span class="close">&times;</span>
+                            <h2>Terms and Conditions</h2>
+                            <h3>Privacy Rights</h3>
+                            <p>Your privacy is important to us. This section outlines the privacy rights of our users.
+                            </p>
+                            <p><strong>Collection of Information:</strong> We collect information you provide directly
+                                to us when you create an account, update your profile, participate in interactive
+                                features of our services, request customer support, or otherwise communicate with us.
+                                This information may include your name, email address, phone number, date of birth,
+                                gender, and any other information you choose to provide.</p>
+                            <p><strong>Use of Information:</strong> We use the information we collect to provide,
+                                maintain, and improve our services, such as processing transactions, sending you
+                                technical notices, updates, security alerts, and support and administrative messages.
+                            </p>
+                            <p><strong>Sharing of Information:</strong> We do not share your personal information with
+                                third parties except as necessary to provide our services or as required by law. This
+                                may include sharing information with service providers who perform services on our
+                                behalf, such as payment processing, data analysis, email delivery, hosting services, and
+                                customer service.</p>
+                            <p><strong>Security:</strong> We take reasonable measures to help protect information about
+                                you from loss, theft, misuse, and unauthorized access, disclosure, alteration, and
+                                destruction.</p>
+                            <p><strong>Your Rights:</strong> You have the right to access, update, correct, or delete
+                                your personal information. You can do this by logging into your account or by contacting
+                                us directly.</p>
+                            <p><strong>Changes to this Policy:</strong> We may change this Privacy Policy from time to
+                                time. If we make changes, we will notify you by revising the date at the top of the
+                                policy and, in some cases, we may provide you with additional notice (such as adding a
+                                statement to our homepage or sending you a notification).</p>
+                            <p>By using our services, you agree to the collection and use of your information in
+                                accordance with this Privacy Policy. If you have any questions about this policy, please
+                                contact us.</p>
+                        </div>
+                    </div>
+                    <div class="buttons">
+                        <button type="submit">Register</button>
+                    </div>
+
             </form>
-            
+
 
 
             <div class="register-link">
@@ -333,20 +354,20 @@ $conn->close();
 
             document.getElementById('age').value = age;
         }
-        document.getElementById('termsLink').addEventListener('click', function(event) {
-    event.preventDefault();
-    document.getElementById('termsModal').style.display = 'block';
-});
+        document.getElementById('termsLink').addEventListener('click', function (event) {
+            event.preventDefault();
+            document.getElementById('termsModal').style.display = 'block';
+        });
 
-document.querySelector('.modal .close').addEventListener('click', function() {
-    document.getElementById('termsModal').style.display = 'none';
-});
+        document.querySelector('.modal .close').addEventListener('click', function () {
+            document.getElementById('termsModal').style.display = 'none';
+        });
 
-window.onclick = function(event) {
-    if (event.target == document.getElementById('termsModal')) {
-        document.getElementById('termsModal').style.display = 'none';
-    }
-};
+        window.onclick = function (event) {
+            if (event.target == document.getElementById('termsModal')) {
+                document.getElementById('termsModal').style.display = 'none';
+            }
+        };
 
 
         function validateForm() {
@@ -453,25 +474,25 @@ window.onclick = function(event) {
                 contactNumberError.style.display = 'none';
             }
 
-    var terms = document.getElementById('terms').checked;
-    var termsError = document.getElementById('termsError');
+            var terms = document.getElementById('terms').checked;
+            var termsError = document.getElementById('termsError');
 
-    if (!terms) {
-        termsError.textContent = 'You must agree to the terms and conditions.';
-        termsError.style.display = 'block';
-        isValid = false;
-    } else {
-        termsError.style.display = 'none';
-    }
+            if (!terms) {
+                termsError.textContent = 'You must agree to the terms and conditions.';
+                termsError.style.display = 'block';
+                isValid = false;
+            } else {
+                termsError.style.display = 'none';
+            }
 
-  
+
 
             return isValid;
         }
     </script>
-    <script>
-        
+   
 
-</body>
 
-</html>
+</body >
+
+</html >

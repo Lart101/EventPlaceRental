@@ -111,6 +111,7 @@ if (!isset($_SESSION['user_id'])) {
             <a href="index1.php" class="btn btn-lg btn-primary btn-back">Back to Home</a>
         </div>
     </div>
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

@@ -1,24 +1,39 @@
 <?php
 session_start();
 
+// Check if the user is already logged in
 if (isset($_SESSION['user_id'])) {
     header('Location: swimming_packages.php');
     exit();
 }
 
+// Database connection
 $conn = new mysqli("localhost", "root", "", "event_store");
-
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Error message variable
 $error = '';
 
+// Handling form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
+    // Define the admin credentials
+    $adminUsername = "@@@@@";
+    $adminPassword = "@@@@@";
 
+    // Check if the entered credentials are admin credentials
+    if ($username === $adminUsername && $password === $adminPassword) {
+        // Redirect to admin_package.php upon successful admin login
+        $_SESSION['user_id'] = 'admin'; // Just a placeholder for admin login
+        header('Location: admin_package.php');
+        exit();
+    }
+
+    // Perform regular user login check
     $sql = "SELECT id, password FROM users WHERE username = ?";
     $stmt = $conn->prepare($sql);
     if ($stmt) {
@@ -27,7 +42,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_result($userId, $storedPassword);
         $stmt->fetch();
 
-  
         if ($password === $storedPassword) {
             $_SESSION['user_id'] = $userId;
             header('Location: swimming_packages.php');

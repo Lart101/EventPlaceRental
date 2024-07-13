@@ -24,6 +24,13 @@ try {
         $userId = $_SESSION['user_id'] ?? null;
         $startDate = $_POST['start_date'] ?? null;
         $endDate = $_POST['end_date'] ?? null;
+        $packageName= $_POST['package_name'] ?? null;
+        $inclusions= $_POST['inclusions'] ?? null;
+        $addOns= $_POST['add_ons[]'] ?? null;
+        $reservationFee= $_POST['reservationFee'] ?? null;
+        $price= $_POST['price'] ?? null;
+
+
 
         if ($endDate === null) {
             // If end date is null, set it to start date
@@ -41,7 +48,10 @@ try {
             $uploadPath = $uploadDir . $fileName;
 
             if (move_uploaded_file($_FILES['proof_of_payment']['tmp_name'], $uploadPath)) {
-                $proofOfPayment = $uploadPath;
+                // Read file contents
+                $fileContent = file_get_contents($uploadPath);
+                // Store file contents in $proofOfPayment variable
+                $proofOfPayment = $fileContent;
             } else {
                 echo "Failed to upload file.";
             }
@@ -88,12 +98,23 @@ try {
             $mailBody .= "<p>Thank you for your reservation with Board Mart!</p>";
             $mailBody .= "<p>Reservation Details:</p>";
             $mailBody .= "<ul>";
-            $mailBody .= "<li>Reservation ID: $reservationId</li>";
-            $mailBody .= "<li>Package ID: $packageId</li>";
+            $mailBody .= "<li>Package Name: $packageName</li>";
+            $mailBody .= "<li>Inclusions: $inclusions</li>";
+          
             $mailBody .= "<li>Start Date: $startDate</li>";
             $mailBody .= "<li>End Date: $endDate</li>";
+            if (is_array($addOns) && empty($addOns)) {
+                $mailBody .= '<li>No add ons</li>';
+            } elseif (is_array($addOns)) {
+               
+                $mailBody .= '<li>Add Ons: ' . implode(', ', $addOns) . '</li>'; 
+            } else {
+                
+                $mailBody .= '<li>Add Ons: ' . $addOns . '</li>';
+            }
+            $mailBody .= "<li>Package Price: $price</li>";
+            $mailBody .= "<li>Reservation Fee: $reservationFee</li>";
             $mailBody .= "<li>Total Price: ₱$totalPrice</li>";
-       
             
             $mailBody .= "</ul>";
             $mailBody .= "<p>Thank you for choosing Board Mart. If you have any questions, feel free to contact us.</p>";

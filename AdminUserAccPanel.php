@@ -1,14 +1,17 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "event_store";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+session_start();
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+
+// Check if user is not logged in or username is not "@@@@"
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
 }
+
+
+
+ include 'config.php';
 
 $message = "";
 
@@ -23,12 +26,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create"])) {
     $contact_number = $_POST["contact_number"];
     $address = $_POST["address"];
 
-    
+
     $dob = new DateTime($date_of_birth);
     $now = new DateTime();
     $age = $now->diff($dob)->y;
 
-  
+
     $check_username_sql = "SELECT * FROM users WHERE username = '$username'";
     $result = $conn->query($check_username_sql);
 
@@ -89,6 +92,7 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -99,56 +103,71 @@ $conn->close();
         .modal-body form {
             width: 100%;
         }
+
         .modal-body form .form-group {
             margin-bottom: 15px;
         }
+
         .table-responsive {
             overflow-x: auto;
         }
+
         /* NavBar to Repa */
 
-.navbar {
-    background-color: whitesmoke; 
-}
+        .navbar {
+            background-color: whitesmoke;
+        }
 
-.navbar-nav .nav-link {
-    color: black;
-    font-size: 1.1rem; 
-}
+        .navbar-nav .nav-link {
+            color: black;
+            font-size: 1.1rem;
+        }
 
-.navbar-nav .nav-item {
-    padding: 0 1rem;
-}
+        .navbar-nav .nav-item {
+            padding: 0 1rem;
+        }
 
-.navbar .navbar-nav .nav-item{
-    position: relative;
-}
+        .navbar .navbar-nav .nav-item {
+            position: relative;
+        }
 
-.navbar .navbar-nav .nav-item::after{
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    content: '';
-    background-color: black;
-    width: 0%;
-    height: 4px;
-    transition: 500ms;
-}
+        .navbar .navbar-nav .nav-item::after {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            content: '';
+            background-color: black;
+            width: 0%;
+            height: 4px;
+            transition: 500ms;
+        }
 
-.navbar .navbar-nav .nav-item:hover:after{
-    width: 100%;
-}
+        .navbar .navbar-nav .nav-item:hover:after {
+            width: 100%;
+        }
 
+        .nav-item.logout button {
+            color: #dc3545;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-item.logout button:hover {
+            color: #fff;
+            background-color: #dc3545;
+        }
     </style>
 </head>
+
 <body>
-<nav class="navbar navbar-expand-lg fixed-top">
+<?php include 'admin_navbar.php'; ?>
         <div class="container-lg">
-        <a class="navbar-brand" href="AdminUserAccPanel.php">
-            <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
-            Board Mart User Admin
-        </a>
+            <a class="navbar-brand" href="AdminUserAccPanel.php">
+                <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
+                Board Mart User Admin
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -159,19 +178,48 @@ $conn->close();
                         <li class="nav-item">
                             <a class="nav-link" href="admin_package.php">Package</a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_reservations.php">Reservation</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="AdminUserAccPanel.php">User</a>
                         </li>
-                       
+                        <?php
+
+                        if (!isset($_SESSION['user_id'])):
+                            ?>
+
+                            <li class="nav-item login">
+                                <a class="nav-link" href="login.php">Login</a>
+                            </li>
+                        <?php else: ?>
+
+                            <li class="nav-item logout">
+                                <form action="logout.php" method="POST">
+                                    <button type="submit" class="nav-link btn btn-link"
+                                        onclick="return confirmLogout()">Logout</button>
+                                </form>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </div>
         </div>
     </nav>
-    <div class="container" style="margin-top:5%" >
+    <script>
+
+
+        function confirmLogout() {
+            return confirm('Are you sure you want to logout?');
+        }
+    </script>
+
+
+    <div class="container" style="margin-top:5%">
         <div class="form-left">
             <div class="title">Admin Panel</div>
-        
+
             <?php if ($message != "") { ?>
                 <div class='message'><?php echo $message; ?></div>
             <?php } ?>
@@ -183,7 +231,8 @@ $conn->close();
                         <button type="button" id="searchButton" class="btn btn-primary btn-custom-large">Search</button>
                     </div>
                     <div class="col-md-4 d-flex justify-content-end">
-                        <button type="button" class="btn btn-success btn-custom-large" data-toggle="modal" data-target="#createUserModal">Create User</button>
+                        <button type="button" class="btn btn-success btn-custom-large" data-toggle="modal"
+                            data-target="#createUserModal">Create User</button>
                     </div>
                 </div>
 
@@ -216,7 +265,15 @@ $conn->close();
                                     <td><?php echo $user['contact_number']; ?></td>
                                     <td><?php echo $user['address']; ?></td>
                                     <td>
-                                        <a href="#" class="edit-user" data-id="<?php echo $user['id']; ?>" data-username="<?php echo $user['username']; ?>" data-full_name="<?php echo $user['full_name']; ?>" data-email="<?php echo $user['email']; ?>" data-date_of_birth="<?php echo $user['date_of_birth']; ?>" data-gender="<?php echo $user['gender']; ?>" data-contact_number="<?php echo $user['contact_number']; ?>" data-address="<?php echo $user['address']; ?>" data-toggle="modal" data-target="#editUserModal">Edit</a>
+                                        <a href="#" class="edit-user" data-id="<?php echo $user['id']; ?>"
+                                            data-username="<?php echo $user['username']; ?>"
+                                            data-full_name="<?php echo $user['full_name']; ?>"
+                                            data-email="<?php echo $user['email']; ?>"
+                                            data-date_of_birth="<?php echo $user['date_of_birth']; ?>"
+                                            data-gender="<?php echo $user['gender']; ?>"
+                                            data-contact_number="<?php echo $user['contact_number']; ?>"
+                                            data-address="<?php echo $user['address']; ?>" data-toggle="modal"
+                                            data-target="#editUserModal">Edit</a>
                                         <a href="#" class="delete-user" data-id="<?php echo $user['id']; ?>">Delete</a>
                                     </td>
                                 </tr>
@@ -227,7 +284,8 @@ $conn->close();
             </div>
 
             <!-- Create User Modal -->
-            <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserModalLabel" aria-hidden="true">
+            <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog"
+                aria-labelledby="createUserModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -239,32 +297,33 @@ $conn->close();
                         <div class="modal-body">
                             <form id="createUserForm" method="post" action="">
                                 <input type="hidden" name="create" value="1">
-                                
+
                                 <div class="form-group">
                                     <label for="username">Username:</label>
                                     <input type="text" id="username" name="username" class="form-control" required>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="password">Password:</label>
                                     <input type="password" id="password" name="password" class="form-control" required>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="full_name">Full Name:</label>
                                     <input type="text" id="full_name" name="full_name" class="form-control" required>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="email">Email:</label>
                                     <input type="email" id="email" name="email" class="form-control" required>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="date_of_birth">Date of Birth:</label>
-                                    <input type="date" id="date_of_birth" name="date_of_birth" class="form-control" required onchange="calculateAge('createUserForm', 'date_of_birth', 'age')">
+                                    <input type="date" id="date_of_birth" name="date_of_birth" class="form-control"
+                                        required onchange="calculateAge('createUserForm', 'date_of_birth', 'age')">
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="gender">Gender:</label>
                                     <select id="gender" name="gender" class="form-control" required>
@@ -273,12 +332,13 @@ $conn->close();
                                         <option value="other">Other</option>
                                     </select>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="contact_number">Contact Number:</label>
-                                    <input type="tel" id="contact_number" name="contact_number" class="form-control" required>
+                                    <input type="tel" id="contact_number" name="contact_number" class="form-control"
+                                        required>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="address">Address:</label>
                                     <textarea id="address" name="address" class="form-control" required></textarea>
@@ -297,7 +357,8 @@ $conn->close();
             </div>
 
             <!-- Edit User Modal -->
-            <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+            <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -310,27 +371,28 @@ $conn->close();
                             <form id="editUserForm" method="post" action="">
                                 <input type="hidden" name="update" value="1">
                                 <input type="hidden" id="editUserId" name="id">
-                                
+
                                 <div class="form-group">
                                     <label for="editUsername">Username:</label>
                                     <input type="text" id="editUsername" name="username" class="form-control" required>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="editFullName">Full Name:</label>
                                     <input type="text" id="editFullName" name="full_name" class="form-control" required>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="editEmail">Email:</label>
                                     <input type="email" id="editEmail" name="email" class="form-control" required>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="editDateOfBirth">Date of Birth:</label>
-                                    <input type="date" id="editDateOfBirth" name="date_of_birth" class="form-control" required onchange="calculateAge('editUserForm', 'editDateOfBirth', 'editAge')">
+                                    <input type="date" id="editDateOfBirth" name="date_of_birth" class="form-control"
+                                        required onchange="calculateAge('editUserForm', 'editDateOfBirth', 'editAge')">
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="editGender">Gender:</label>
                                     <select id="editGender" name="gender" class="form-control" required>
@@ -339,12 +401,13 @@ $conn->close();
                                         <option value="other">Other</option>
                                     </select>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="editContactNumber">Contact Number:</label>
-                                    <input type="tel" id="editContactNumber" name="contact_number" class="form-control" required>
+                                    <input type="tel" id="editContactNumber" name="contact_number" class="form-control"
+                                        required>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="editAddress">Address:</label>
                                     <textarea id="editAddress" name="address" class="form-control" required></textarea>
@@ -363,7 +426,7 @@ $conn->close();
             </div>
         </div>
     </div>
-    
+
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -381,9 +444,9 @@ $conn->close();
             document.getElementById(ageId).value = age;
         }
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Edit user modal
-            $('.edit-user').on('click', function() {
+            $('.edit-user').on('click', function () {
                 var id = $(this).data('id');
                 var username = $(this).data('username');
                 var full_name = $(this).data('full_name');
@@ -407,7 +470,7 @@ $conn->close();
             });
 
             // Delete user
-            $('.delete-user').on('click', function() {
+            $('.delete-user').on('click', function () {
                 var id = $(this).data('id');
                 if (confirm('Are you sure you want to delete this user?')) {
                     window.location.href = '?delete=' + id;
@@ -415,9 +478,9 @@ $conn->close();
             });
 
             // Search functionality
-            $('#searchButton').on('click', function() {
+            $('#searchButton').on('click', function () {
                 var value = $('#searchInput').val().toLowerCase();
-                $("#userTable tbody tr").each(function() {
+                $("#userTable tbody tr").each(function () {
                     var username = $(this).find('td:nth-child(2)').text().toLowerCase();
                     var fullName = $(this).find('td:nth-child(3)').text().toLowerCase();
                     if (username.includes(value) || fullName.includes(value)) {
@@ -429,5 +492,7 @@ $conn->close();
             });
         });
     </script>
+  
 </body>
+
 </html>

@@ -11,8 +11,49 @@ $conn = new mysqli("localhost", "root", "", "event_store");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
 $user_id = $_SESSION['user_id'];
+if (isset($_POST['edit_profile'])) {
+    // Retrieve form data
+    $oldPassword = $_POST['old_password'];
+    $newPassword = $_POST['new_password'];
+    $confirmNewPassword = $_POST['confirm_new_password'];
+    
+    // Validate if new password and confirm new password match
+    if ($newPassword !== $confirmNewPassword) {
+        // Handle password mismatch error
+        $_SESSION['error'] = "New password and confirm password do not match.";
+        header("Location: profilecopy.php");
+        exit;
+    }
+    
+    // Retrieve current password from database for the user
+    $sql = "SELECT password FROM users WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stmt->bind_result($currentPassword);
+    $stmt->fetch();
+    $stmt->close();
+    
+    if ($oldPassword === $currentPassword) {
+        // Passwords match, proceed to update the password
+        // Update the password in the database
+        $updateSql = "UPDATE users SET password = ? WHERE id = ?";
+        $updateStmt = $conn->prepare($updateSql);
+        $updateStmt->bind_param("si", $newPassword, $user_id);
+        $updateStmt->execute();
+        $updateStmt->close();
+        
+        $_SESSION['success'] = "Password updated successfully.";
+        header("Location: profilecopy.php");
+        exit;
+    } else {
+        // Old password is incorrect
+        $_SESSION['error'] = "Old password is incorrect.";
+        header("Location: profilecopy.php");
+        exit;
+    }
+}
 
 // Handle reservation cancellation
 if (isset($_POST['cancel_reservation'])) {
@@ -36,10 +77,10 @@ if (isset($_POST['cancel_reservation'])) {
 }
 
 // Fetch user details
-$stmt = $conn->prepare("SELECT username, email FROM users WHERE id = ?");
+$stmt = $conn->prepare("SELECT username, email,full_name,age,contact_number,address,gender FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$stmt->bind_result($username, $email);
+$stmt->bind_result($username, $email,$full_name,$age,$contact_number,$address,$gender);
 $stmt->fetch();
 $stmt->close();
 
@@ -52,7 +93,6 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $reservations = $stmt->get_result();
 $stmt->close();
-
 
 $conn->close();
 ?>
@@ -139,142 +179,154 @@ $conn->close();
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container-lg">
-            <a class="navbar-brand" href="index.html">
-                <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
-                Board Mart Event Place
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="mx-auto">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index1.php">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="swimming_packages.php">Packages</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="contactmain.php">Contact</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="profilecopy.php">Profile</a>
-                        </li>
-                        <?php if (!isset($_SESSION['user_id'])): ?>
-                            <li class="nav-item login">
-                                <a class="nav-link" href="login.php">Login</a>
-                            </li>
-                        <?php else: ?>
-                            <li class="nav-item logout">
-                                <form action="logout.php" method="POST">
-                                    <button type="submit" class="nav-link btn btn-link"
-                                        onclick="return confirmLogout()">Logout</button>
-                                </form>
-                            </li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
-
+<?php include 'user_navbar.php'; ?>
+    
     <div class="container mt-5">
+          <!-- Display Alerts for Password Change Status -->
+          <?php if (isset($_SESSION['success'])): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
         <div class="row">
             <div class="col-md-8 offset-md-2">
                 <div class="card">
                     <div class="card-body">
                         <h2 class="card-title">User Profile</h2>
                         <p><strong>Username:</strong> <?php echo htmlspecialchars($username); ?></p>
+                        <p><strong>Full Name:</strong> <?php echo htmlspecialchars($full_name); ?></p>
+                        <p><strong>Gender:</strong> <?php echo htmlspecialchars($gender); ?></p>
+                        <p><strong>Age:</strong> <?php echo htmlspecialchars($age); ?></p>
+                        <p><strong>Contact Number (+63):</strong> <?php echo htmlspecialchars($contact_number); ?></p>
+                        <p><strong>Address:</strong> <?php echo htmlspecialchars($address); ?></p>
                         <p><strong>Email:</strong> <?php echo htmlspecialchars($email); ?></p>
+
 
                         <button type="button" class="btn btn-edit-profile" data-bs-toggle="modal"
                             data-bs-target="#editProfileModal">
-                            Edit Profile
+                            Change Password
                         </button>
                     </div>
                 </div>
             </div>
-
             <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title">Reservation History</h3>
+            <div class="card-body">
+                <h3 class="card-title">Reservation History</h3>
 
-                    <?php if (!empty($reservations)): ?>
-                        <?php foreach ($reservations as $reservation): ?>
-                            <div class="reservation-card">
-                                <div class="reservation-details">
-                                    <h5><strong><?php echo htmlspecialchars($reservation['package_name']); ?></strong>
-                                    </h5>
-                                    <p><strong>Date:</strong>
-                                        <?php echo date('M d, Y', strtotime($reservation['start_date'])) . ' to ' . date('M d, Y', strtotime($reservation['end_date'])); ?>
-                                    </p>
-                                    <p><strong>Total Price:</strong>
-                                        ₱<?php echo htmlspecialchars($reservation['total_price']); ?></p>
-                                    <p><strong>Status:</strong>
-                                        <?php
-                                        $status = htmlspecialchars($reservation['status']);
-                                        switch ($status) {
-                                            case 'Pending':
-                                                echo '<span class="badge bg-primary">' . $status . '</span>';
-                                                break;
-                                            case 'Accepted':
-                                                echo '<span class="badge bg-success">' . $status . '</span>';
-                                                break;
-                                            case 'Denied':
-                                                echo '<span class="badge bg-danger">' . $status . '</span>';
-                                                break;
-                                            case 'Cancelled':
-                                                echo '<span class="badge bg-danger">' . $status . '</span>';
-                                                break;
-                                            default:
-                                                echo '<span class="badge bg-secondary">' . $status . '</span>';
-                                                break;
-                                        }
-                                        ?>
-                                    </p>
-                                    <?php if (in_array($reservation['status'], ['Pending', 'Accepted', 'Denied'])): ?>
-                                        <form action="profilecopy.php" method="POST" onsubmit="return confirmCancellation();">
-                                            <input type="hidden" name="reservation_id" value="<?php echo $reservation['id']; ?>">
-                                            <button type="submit" class="btn btn-danger" name="cancel_reservation">Cancel
-                                                Reservation</button>
-                                        </form>
-                                    <?php elseif ($reservation['status'] === 'Cancelled'): ?>
-                                        <button type="button" class="btn btn-secondary" disabled>Cancelled</button>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="reservation-card">
-                            <div class="reservation-details text-center">
-                                <h5 class="text-danger">No reservations found</h5>
-                                <p class="text-muted">You have no reservations at the moment.</p>
-                            </div>
-                        </div>
-                    <?php endif; ?>
+                <!-- Tabs for different reservation statuses -->
+                <ul class="nav nav-tabs" id="reservationTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
+                            type="button" role="tab" aria-controls="pending" aria-selected="true">Pending</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="accepted-tab" data-bs-toggle="tab" data-bs-target="#accepted"
+                            type="button" role="tab" aria-controls="accepted" aria-selected="false">Accepted</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled"
+                            type="button" role="tab" aria-controls="cancelled" aria-selected="false">Cancelled</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="denied-tab" data-bs-toggle="tab" data-bs-target="#denied"
+                            type="button" role="tab" aria-controls="denied" aria-selected="false">Denied</button>
+                    </li>
+                </ul>
 
+                <!-- Tab content panes -->
+                <div class="tab-content" id="reservationTabsContent">
+                    <!-- Pending reservations -->
+                    <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                        <?php displayReservationsByStatus($reservations, 'Pending'); ?>
+                    </div>
+
+                    <!-- Accepted reservations -->
+                    <div class="tab-pane fade" id="accepted" role="tabpanel" aria-labelledby="accepted-tab">
+                        <?php displayReservationsByStatus($reservations, 'Accepted'); ?>
+                    </div>
+
+                    <!-- Cancelled reservations -->
+                    <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab">
+                        <?php displayReservationsByStatus($reservations, 'Cancelled'); ?>
+                    </div>
+
+                    <!-- Denied reservations -->
+                    <div class="tab-pane fade" id="denied" role="tabpanel" aria-labelledby="denied-tab">
+                        <?php displayReservationsByStatus($reservations, 'Denied'); ?>
+                    </div>
                 </div>
             </div>
-
-
+        </div>
+    </div>
         </div>
 
-
-
-
     </div>
 
+    <?php
+// Function to display reservations based on status
+function displayReservationsByStatus($reservations, $status) {
+    echo '<div class="mt-3">';
 
+    if (!empty($reservations)) {
+        foreach ($reservations as $reservation) {
+            if ($reservation['status'] === $status) {
+                echo '<div class="reservation-card">';
+                echo '<div class="reservation-details">';
+                echo '<h5><strong>' . htmlspecialchars($reservation['package_name']) . '</strong></h5>';
+                echo '<p><strong>Date:</strong> ' . date('M d, Y', strtotime($reservation['start_date'])) . ' to ' . date('M d, Y', strtotime($reservation['end_date'])) . '</p>';
+                echo '<p><strong>Total Price:</strong> ₱' . htmlspecialchars($reservation['total_price']) . '</p>';
+                echo '<p><strong>Status:</strong> ';
 
+                switch ($status) {
+                    case 'Pending':
+                        echo '<span class="badge bg-primary">' . $status . '</span>';
+                        break;
+                    case 'Accepted':
+                        echo '<span class="badge bg-success">' . $status . '</span>';
+                        break;
+                    case 'Denied':
+                    case 'Cancelled':
+                        echo '<span class="badge bg-danger">' . $status . '</span>';
+                        break;
+                    default:
+                        echo '<span class="badge bg-secondary">' . $status . '</span>';
+                        break;
+                }
 
+                echo '</p>';
 
+               // Check if reservation is not Cancelled or Denied to show cancellation button
+               if ($reservation['status'] !== 'Cancelled' && $reservation['status'] !== 'Denied') {
+                echo '<form action="profilecopy.php" method="POST" onsubmit="return confirmCancellation();">';
+                echo '<input type="hidden" name="reservation_id" value="' . $reservation['id'] . '">';
+                echo '<button type="submit" class="btn btn-danger" name="cancel_reservation">Cancel Reservation</button>';
+                echo '</form>';
+            } else {
+                echo '<button type="button" class="btn btn-secondary" disabled>Cancelled</button>';
+            }
 
-    </div>
+            echo '</div></div>';
+        }
+    }
+    } else {
+        echo '<div class="reservation-card">';
+        echo '<div class="reservation-details text-center">';
+        echo '<h5 class="text-danger">No ' . strtolower($status) . ' reservations found</h5>';
+        echo '<p class="text-muted">You have no ' . strtolower($status) . ' reservations.</p>';
+        echo '</div></div>';
+    }
 
+    echo '</div>';
+}
+?>
     <script>
         function confirmCancellation() {
             return confirm("Are you sure you want to cancel this reservation? Please note that cancelling your reservation means you will not receive any refund.");
@@ -282,104 +334,70 @@ $conn->close();
     </script>
 
 
-    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="profilecopy.php" method="POST">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="profilecopy.php" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Change Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="oldPassword" class="form-label">Old Password</label>
+                        <input type="password" class="form-control" id="oldPassword" name="old_password" required>
                     </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="editUsername" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="editUsername" name="username"
-                                value="<?php echo htmlspecialchars($username); ?>" required>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="newPassword" name="new_password"
+                                pattern="^(?=.*[a-z])(?=.*[A-Z]).{6,14}$"
+                                title="Password must be between 6 and 14 characters long and include at least one uppercase and one lowercase letter."
+                                required>
+                            
                         </div>
-                        <div class="mb-3">
-                            <label for="editEmail" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="editEmail" name="email"
-                                value="<?php echo htmlspecialchars($email); ?>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editPassword" class="form-label">New Password</label>
-                            <div class="input-group">
-                                <input type="password" class="form-control" id="editPassword" name="password"
-                                    pattern="^(?=.*[a-z])(?=.*[A-Z]).{6,14}$"
-                                    title="Password must be between 6 and 14 characters long and include at least one uppercase and one lowercase letter."
-                                    required>
-                                <button class="btn btn-outline-secondary" type="button" id="togglePassword"
-                                    onclick="togglePasswordVisibility()">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
-                            <div id="passwordHelpBlock" class="form-text">
-                                Your password must be between 6 and 14 characters long and contain at least one
-                                uppercase and one lowercase letter.
-                            </div>
+                        <div id="passwordHelpBlock" class="form-text">
+                            Your password must be between 6 and 14 characters long and contain at least one uppercase
+                            and one lowercase letter.
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" name="edit_profile">Save changes</button>
+                    <div class="mb-3">
+                        <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmNewPassword"
+                            name="confirm_new_password" required>
                     </div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" name="edit_profile">Save changes</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
+<script>
+        // Auto-close alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var alertInstance = new bootstrap.Alert(alert);
+                alertInstance.close();
+            });
+        }, 5000);
+    </script>
 
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
     <script>
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('editPassword');
-            const toggleButton = document.getElementById('togglePassword');
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleButton.innerHTML = '<i class="bi bi-eye-slash"></i>';
-            } else {
-                passwordInput.type = 'password';
-                toggleButton.innerHTML = '<i class="bi bi-eye"></i>';
-            }
-        }
+    
 
         function confirmLogout() {
             return confirm('Are you sure you want to logout?');
         }
     </script>
-    <footer class="footer mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12 text-center">
-                    <p>&copy; 2024 Board Mart Event Place. All Rights Reserved.</p>
-                    <div class="mt-4">
-                        <h3>Follow Us on:</h3>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <a href="https://www.facebook.com/BoardMartsEventPlace" target="_blank">
-                                    <i class="bi bi-facebook" style="font-size: 1rem; margin-right: 10px;"></i>
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="https://www.instagram.com/boardmarseventplace" target="_blank">
-                                    <i class="bi bi-instagram" style="font-size: 1rem; margin-right: 10px;"></i>
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="https://x.com/Boardmart" target="_blank">
-                                    <i class="bi bi-twitter" style="font-size: 1rem; margin-right: 10px;"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+   <?php include 'footer.php'; ?>
 </body>
 
 </html>

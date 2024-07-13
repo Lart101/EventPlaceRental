@@ -114,52 +114,7 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container-lg">
-        <a class="navbar-brand" href="index.html">
-            <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
-            Board Mart Event Place
-        </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="mx-auto">
-                    <ul class="navbar-nav">
-                    <li class="nav-item">
-                            <a class="nav-link" href="index1.php">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="swimming_packages.php">Packages</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="contactmain.php">Contact</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="profilecopy.php">Profile</a>
-                        </li>
-                        <?php
-                      
-                        if (!isset($_SESSION['user_id'])):
-                        ?>
-                         
-                            <li class="nav-item login">
-                                <a class="nav-link" href="login.php">Login</a>
-                            </li>
-                        <?php else: ?>
-                            
-                            <li class="nav-item logout">
-                                <form action="logout.php" method="POST">
-                                    <button type="submit" class="nav-link btn btn-link" onclick="return confirmLogout()">Logout</button>
-                                </form>
-                            </li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <?php include 'user_navbar.php'; ?>
 
 
 
@@ -177,7 +132,7 @@
                 <div class="col-md-6 mb-4">
                     <ul class="list-unstyled">
                         <li><i class="bi bi-geo-alt-fill"></i> <strong>Location:</strong>BoardMart’s Event Place, 1043 Mendoza, Valenzuela, Metro Manila</li>
-                        <li><i class="bi bi-envelope-fill"></i> <strong>Email:</strong> <a href="mailto:boardmarteventplace@yahoo.com">boardmarteventplace@yahoo.com</a></li>
+                        <li><i class="bi bi-envelope-fill"></i> <strong>Email:</strong> boardmarteventplace@yahoo.com</li>
                     </ul>
                     <div class="mt-4">
                         <h3>Follow Us on:</h3>
@@ -212,9 +167,8 @@
             <div class="col-md-8 col-lg-6 mb-4">
                 <form id="contact-form" action="contact.php" method="POST">
                     <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
-<input type="text" class="form-control" id="name" name="name" required pattern="[A-Za-z]+" title="Please enter letters only">
-
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required pattern="[A-Za-z]+" title="Please enter letters only">
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
@@ -225,28 +179,83 @@
                         <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
                     </div>
                     <div class="mb-3">
-    <h3>Rate our services!</h3>
-    <div class="star-rating">
-        <input type="radio" id="5-stars" name="rating" value="5" required>
-        <label for="5-stars" class="bi bi-star-fill"></label>
-        <input type="radio" id="4-stars" name="rating" value="4" required>
-        <label for="4-stars" class="bi bi-star-fill"></label>
-        <input type="radio" id="3-stars" name="rating" value="3" required>
-        <label for="3-stars" class="bi bi-star-fill"></label>
-        <input type="radio" id="2-stars" name="rating" value="2" required>
-        <label for="2-stars" class="bi bi-star-fill"></label>
-        <input type="radio" id="1-star" name="rating" value="1" required>
-        <label for="1-star" class="bi bi-star-fill"></label>
-    </div>
-    <small class="text-danger">Please rate our services.</small>
-</div>
+                        <h3>Rate our services!</h3>
+                        <div class="star-rating">
+                            <input type="radio" id="5-stars" name="rating" value="5" required>
+                            <label for="5-stars" class="bi bi-star-fill"></label>
+                            <input type="radio" id="4-stars" name="rating" value="4" required>
+                            <label for="4-stars" class="bi bi-star-fill"></label>
+                            <input type="radio" id="3-stars" name="rating" value="3" required>
+                            <label for="3-stars" class="bi bi-star-fill"></label>
+                            <input type="radio" id="2-stars" name="rating" value="2" required>
+                            <label for="2-stars" class="bi bi-star-fill"></label>
+                            <input type="radio" id="1-star" name="rating" value="1" required>
+                            <label for="1-star" class="bi bi-star-fill"></label>
+                        </div>
+                        <span id="rating-error" class="error-message" style="display: none;color:red;">Please rate our services.</span>
+                    </div>
 
-                    <button type="submit" class="btn btn-primary d-block mx-auto">Submit</button>
+                    <button type="submit" class="btn btn-primary d-block mx-auto" onclick="return validateForm()">Submit</button>
                 </form>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    // Wait for the DOM to fully load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listener for form submission
+        document.getElementById('contact-form').addEventListener('submit', function(event) {
+            var ratingInputs = document.querySelectorAll('input[type="radio"][name="rating"]');
+            var ratingSelected = false;
+
+            // Check if any rating option is selected
+            ratingInputs.forEach(function(input) {
+                if (input.checked) {
+                    ratingSelected = true;
+                }
+            });
+
+            // Display or hide error message based on rating selection
+            if (!ratingSelected) {
+                document.getElementById('rating-error').style.display = 'block';
+                event.preventDefault(); // Prevent form submission
+            } else {
+                document.getElementById('rating-error').style.display = 'none';
+            }
+        });
+    });
+
+    // Function to validate the entire form
+    function validateForm() {
+        var isValid = true;
+
+        // Validate other form fields as per your existing validation logic
+        // Add your existing validation code here
+        
+        // Check if any rating option is selected
+        var ratingInputs = document.querySelectorAll('input[type="radio"][name="rating"]');
+        var ratingSelected = false;
+        ratingInputs.forEach(function(input) {
+            if (input.checked) {
+                ratingSelected = true;
+            }
+        });
+
+        // Display or hide error message based on rating selection
+        if (!ratingSelected) {
+            document.getElementById('rating-error').style.display = 'block';
+            isValid = false;
+        } else {
+            document.getElementById('rating-error').style.display = 'none';
+        }
+
+        return isValid;
+    }
+</script>
+
+
 
 
     <footer class="footer mt-5">

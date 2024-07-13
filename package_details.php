@@ -41,6 +41,7 @@ $stmt_reserved->bind_result($start_date, $end_date);
 while ($stmt_reserved->fetch()) {
     $reservedDates[] = ['start_date' => $start_date, 'end_date' => $end_date];
 }
+
 $stmt_reserved->close();
 
 $conn->close();
@@ -147,54 +148,14 @@ $conn->close();
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container-lg">
-            <a class="navbar-brand" href="index.html">
-                <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
-                Board Mart Event Place
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="mx-auto">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index1.php">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="swimming_packages.php">Packages</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="contactmain.php">Contact</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="profilecopy.php">Profile</a>
-                        </li>
-                        <?php
+<?php include 'user_navbar.php'; ?>
+    <script>
+    
 
-                        if (!isset($_SESSION['user_id'])):
-                            ?>
-
-                            <li class="nav-item login">
-                                <a class="nav-link" href="login.php">Login</a>
-                            </li>
-                        <?php else: ?>
-
-                            <li class="nav-item logout">
-                                <form action="logout.php" method="POST">
-                                    <button type="submit" class="nav-link btn btn-link"
-                                        onclick="return confirmLogout()">Logout</button>
-                                </form>
-                            </li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
-
+    function confirmLogout() {
+        return confirm('Are you sure you want to logout?');
+    }
+</script>
     <nav aria-label="breadcrumb" style="padding-top: 5%; margin-left: 20px;">
         <ol class="breadcrumb fade-in">
             <li class="breadcrumb-item"><a href="swimming.php">Swimming Packages</a></li>
@@ -251,12 +212,10 @@ $conn->close();
                     <div class="mb-3">
                         <label class="form-label">Add-ons</label>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="extendedStay" name="add_ons[]"
-                                value="Extended stay" onchange="calculateTotalPrice()">
-                            <label class="form-check-label" for="extendedStay">Extended stay (₱1,000 per hour)</label>
-                            <input type="number" id="extendedStayHours" name="extended_stay_hours"
-                                class="form-control mt-2" min="0" max="2" value="0" onchange="calculateTotalPrice()">
-                        </div>
+    <input class="form-check-input" type="checkbox" id="extendedStay" name="add_ons[]" value="Extended stay" onchange="toggleExtendedStayHours()">
+    <label class="form-check-label" for="extendedStay">Extended stay (₱1,000 per hour)</label>
+    <input type="number" id="extendedStayHours" name="extended_stay_hours" class="form-control mt-2" min="0" max="2" onchange="calculateTotalPrice()">
+</div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="familyRoom" name="add_ons[]"
                                 value="Family Room" onchange="calculateTotalPrice()">
@@ -300,36 +259,7 @@ $conn->close();
 
         </div>
     </div>
-
-    <footer class="footer mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12 text-center">
-                    <p>&copy; 2024 Board Mart Event Place. All Rights Reserved.</p>
-                    <div class="mt-4">
-                        <h3>Follow Us on:</h3>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <a href="https://www.facebook.com/BoardMartsEventPlace" target="_blank">
-                                    <i class="bi bi-facebook" style="font-size: 1rem; margin-right: 10px;"></i>
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="https://www.instagram.com/boardmarseventplace" target="_blank">
-                                    <i class="bi bi-instagram" style="font-size: 1rem; margin-right: 10px;"></i>
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="https://x.com/Boardmart" target="_blank">
-                                    <i class="bi bi-twitter" style="font-size: 1rem; margin-right: 10px;"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <?php include 'footer.php'; ?>
 
     <div class="image-viewer" id="imageViewer">
         <?php foreach ($packageImages as $index => $image): ?>
@@ -397,10 +327,6 @@ $conn->close();
         });
     </script>
 
-<div class="mb-3">
-    <label for="start_date" class="form-label">Start Date</label>
-    <input type="date" class="form-control" id="start_date" name="start_date" required>
-</div>
 
 <?php if ($package_type == 'Combo'): ?>
     <div class="mb-3">
@@ -408,6 +334,25 @@ $conn->close();
         <input type="date" class="form-control" id="end_date" name="end_date" required disabled>
     </div>
 <?php endif; ?>
+<script>
+function toggleExtendedStayHours() {
+    const extendedStayCheckbox = document.getElementById('extendedStay');
+    const extendedStayHours = document.getElementById('extendedStayHours');
+    
+    if (extendedStayCheckbox.checked) {
+        extendedStayHours.required = true;
+    } else {
+        extendedStayHours.required = false;
+        extendedStayHours.value = ''; // Clear the input if the checkbox is unchecked
+    }
+    calculateTotalPrice();
+}
+</script>
+<script>
+        const startDateInput = document.getElementById('start_date');
+        const today = new Date().toISOString().split('T')[0];
+        startDateInput.setAttribute('min', today);
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const startDateInput = document.getElementById('start_date');

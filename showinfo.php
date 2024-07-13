@@ -118,53 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container-lg">
-            <a class="navbar-brand" href="index.html">
-                <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
-                Board Mart Event Place
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="mx-auto">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index1.php">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="swimming_packages.php">Packages</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="contactmain.php">Contact</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="profilecopy.php">Profile</a>
-                        </li>
-                        <?php
-
-                        if (!isset($_SESSION['user_id'])):
-                            ?>
-
-                            <li class="nav-item login">
-                                <a class="nav-link" href="login.php">Login</a>
-                            </li>
-                        <?php else: ?>
-
-                            <li class="nav-item logout">
-                                <form action="logout.php" method="POST">
-                                    <button type="submit" class="nav-link btn btn-link"
-                                        onclick="return confirmLogout()">Logout</button>
-                                </form>
-                            </li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
+<?php include 'user_navbar.php'; ?>
 
     <div class="container pt-5">
 
@@ -187,6 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <?php if (!empty($addOns)): ?>
                             <p><strong>Add-ons:</strong> <?php echo implode(", ", $addOns); ?></p>
                         <?php endif; ?>
+                        <p><strong>Reservation Fee:</strong> <?php echo $reservationFee; ?></p>
                         <p><strong>Total Price:</strong> ₱<?php echo number_format($totalPrice, 2); ?></p>
                         <p><em>(Reservation fee only. Remaining fee to be paid at the venue)</em></p>
 
@@ -199,6 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="card-body">
                 <form action="insert_reservation.php" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="package_id" value="<?php echo htmlspecialchars($packageId); ?>">
+                    <input type="hidden" name="reservationFee" value="<?php echo htmlspecialchars($reservationFee); ?>">
                     <input type="hidden" name="package_name" value="<?php echo htmlspecialchars($packageName); ?>">
                     <input type="hidden" name="inclusions" value="<?php echo htmlspecialchars($inclusions); ?>">
                     <input type="hidden" name="price" value="<?php echo $price; ?>">
@@ -224,9 +180,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
 
                     <div class="mb-3">
-                        <label for="proof_of_payment" class="form-label">Upload Proof of Payment</label>
-                        <input type="file" class="form-control" id="proof_of_payment" name="proof_of_payment" required>
-                    </div>
+    <label for="proof_of_payment" class="form-label">Upload Proof of Payment</label>
+    <input type="file" class="form-control" id="proof_of_payment" name="proof_of_payment" accept="image/*" required>
+    <div id="proof_of_payment_error" class="invalid-feedback"></div>
+</div>
+
 
                     <div class="mb-3">
                         <input type="checkbox" id="terms" name="terms" required>
@@ -269,35 +227,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
     </div>
-    <footer class="footer mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12 text-center">
-                    <p>&copy; 2024 Board Mart Event Place. All Rights Reserved.</p>
-                    <div class="mt-4">
-                        <h3>Follow Us on:</h3>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <a href="https://www.facebook.com/BoardMartsEventPlace" target="_blank">
-                                    <i class="bi bi-facebook" style="font-size: 1rem; margin-right: 10px;"></i>
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="https://www.instagram.com/boardmarseventplace" target="_blank">
-                                    <i class="bi bi-instagram" style="font-size: 1rem; margin-right: 10px;"></i>
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="https://x.com/Boardmart" target="_blank">
-                                    <i class="bi bi-twitter" style="font-size: 1rem; margin-right: 10px;"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+   
+<?php include 'footer.php'; ?>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -320,6 +251,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         };
     </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Select the file input element
+    var proofOfPaymentInput = document.getElementById('proof_of_payment');
+
+    // Add an event listener to check the file type when a file is selected
+    proofOfPaymentInput.addEventListener('change', function() {
+        var file = this.files[0];
+
+        // Check if the selected file is an image
+        if (file.type.indexOf('image') === -1) {
+            // If not an image, show an error message
+            this.setCustomValidity('Please upload a valid image file.');
+            document.getElementById('proof_of_payment_error').textContent = 'Please upload a valid image file.';
+        } else {
+            // If it's an image, clear any previous error messages
+            this.setCustomValidity('');
+            document.getElementById('proof_of_payment_error').textContent = '';
+        }
+    });
+});
+</script>
+
 </body>
 
 </html>

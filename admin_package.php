@@ -1,10 +1,17 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "event_store";
+session_start();
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli("localhost", "root", "", "event_store");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
+}
+
+require 'config.php';
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -90,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
     $package_type = $_POST["package_type"];
     // Add $package_type to your UPDATE SQL query
     $sql = "UPDATE swimming_packages SET package_name='$package_name', price='$price', duration='$duration', max_pax='$max_pax', inclusions='$inclusions', profile_image='$profile_image', multiple_images='$multiple_images', package_type='$package_type' WHERE id=$id";
-    
+
 
 
     if ($profile_image !== false && !empty($multiple_images)) {
@@ -137,6 +144,8 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Swimming Packages</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="style2.css">
 </head>
 <style>
@@ -188,70 +197,67 @@ $conn->close();
         font-weight: bold;
         cursor: pointer;
     }
+
     /* NavBar to Repa */
 
-.navbar {
-    background-color: whitesmoke; 
-   
-}
+    .navbar {
+        background-color: whitesmoke;
 
-.navbar-nav .nav-link {
-    color: black;
-    font-size: 1.1rem; 
-}
+    }
 
-.navbar-nav .nav-item {
-    padding: 0 1rem;
-}
+    .navbar-nav .nav-link {
+        color: black;
+        font-size: 1.1rem;
+    }
 
-.navbar .navbar-nav .nav-item{
-    position: relative;
-}
+    .navbar-nav .nav-item {
+        padding: 0 1rem;
+    }
 
-.navbar .navbar-nav .nav-item::after{
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    content: '';
-    background-color: black;
-    width: 0%;
-    height: 4px;
-    transition: 500ms;
-}
+    .navbar .navbar-nav .nav-item {
+        position: relative;
+    }
 
-.navbar .navbar-nav .nav-item:hover:after{
-    width: 100%;
-}
+    .navbar .navbar-nav .nav-item::after {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        content: '';
+        background-color: black;
+        width: 0%;
+        height: 4px;
+        transition: 500ms;
+    }
 
+    .navbar .navbar-nav .nav-item:hover:after {
+        width: 100%;
+    }
+
+    .nav-item.logout button {
+        color: #dc3545;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .nav-item.logout button:hover {
+        color: #fff;
+        background-color: #dc3545;
+    }
 </style>
 
 <body>
-<nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container-lg">
-        <a class="navbar-brand" href="admin_package.php">
-            <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
-            Board Mart Package Admin
-        </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="mx-auto">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin_package.php">Package</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="AdminUserAccPanel.php">User</a>
-                        </li>
-                       
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
+<?php include 'admin_navbar.php'; ?>
+    <script>
+
+
+        function confirmLogout() {
+            return confirm('Are you sure you want to logout?');
+        }
+    </script>
+
+
     <div class="container" style="max-width: 1200px;
     width: 100%; 
     margin: 10 auto; 
@@ -281,70 +287,72 @@ $conn->close();
                 </div>
 
                 <table class="table" id="packageTable">
-                <thead>
-    <tr>
-        <th>ID</th>
-        <th>Package Name</th>
-        <th>Package Type</th>
-        <th>Price</th>
-        <th>Duration</th>
-        <th>Max Pax</th>
-        <th>Inclusions</th>
-        <th>Profile Image</th>
-        <th>Multiple Images</th>
-        <th>Actions</th>
-    </tr>
-</thead>
-<tbody>
-    <?php while ($package = $swimming_packages->fetch_assoc()) { ?>
-        <tr>
-            <td><?php echo $package['id']; ?></td>
-            <td><?php echo $package['package_name']; ?></td>
-            <td><?php echo $package['package_type']; ?></td>
-            <td><?php echo $package['price']; ?></td>
-            <td><?php echo $package['duration']; ?></td>
-            <td><?php echo $package['max_pax']; ?></td>
-            <td><?php echo $package['inclusions']; ?></td>
-            <td>
-                <img src="<?php echo $package['profile_image']; ?>" alt="Profile Image"
-                    style="width: 100px; height: 100px; cursor: pointer;"
-                    onclick="openImageViewer('<?php echo $package['multiple_images']; ?>')">
-            </td>
-            <td>
-                <div class="collage">
-                    <?php
-                    $images = explode(',', $package['multiple_images']);
-                    $total_images = count($images);
-                    $max_display = 2;
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Package Name</th>
+                            <th>Package Type</th>
+                            <th>Price</th>
+                            <th>Duration</th>
+                            <th>Max Pax</th>
+                            <th>Inclusions</th>
+                            <th>Profile Image</th>
+                            <th>Multiple Images</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($package = $swimming_packages->fetch_assoc()) { ?>
+                            <tr>
+                                <td><?php echo $package['id']; ?></td>
+                                <td><?php echo $package['package_name']; ?></td>
+                                <td><?php echo $package['package_type']; ?></td>
+                                <td><?php echo $package['price']; ?></td>
+                                <td><?php echo $package['duration']; ?></td>
+                                <td><?php echo $package['max_pax']; ?></td>
+                                <td><?php echo $package['inclusions']; ?></td>
+                                <td>
+                                    <img src="<?php echo $package['profile_image']; ?>" alt="Profile Image"
+                                        style="width: 100px; height: 100px; cursor: pointer;"
+                                        onclick="openImageViewer('<?php echo $package['multiple_images']; ?>')">
+                                </td>
+                                <td>
+                                    <div class="collage">
+                                        <?php
+                                        $images = explode(',', $package['multiple_images']);
+                                        $total_images = count($images);
+                                        $max_display = 2;
 
-                    foreach (array_slice($images, 0, min($max_display, $total_images)) as $image) {
-                        echo "<img src='$image' alt='Multiple Image' style='width: 100px; height: 100px; margin-right: 5px; cursor: pointer;' onclick='openImageViewer(\"{$package['multiple_images']}\")'>";
-                    }
+                                        foreach (array_slice($images, 0, min($max_display, $total_images)) as $image) {
+                                            echo "<img src='$image' alt='Multiple Image' style='width: 100px; height: 100px; margin-right: 5px; cursor: pointer;' onclick='openImageViewer(\"{$package['multiple_images']}\")'>";
+                                        }
 
-                    if ($total_images > $max_display) {
-                        echo "<button class='btn btn-link p-0' onclick='openImageViewer(\"{$package['multiple_images']}\")'>Show More</button>";
-                    }
-                    ?>
-                </div>
-            </td>
-            <td>
-            <button class="btn btn-primary btn-sm edit-package-btn" data-toggle="modal"
-        data-target="#editPackageModal" data-id="<?php echo $package['id']; ?>"
-        data-package_name="<?php echo $package['package_name']; ?>"
-        data-price="<?php echo $package['price']; ?>"
-        data-duration="<?php echo $package['duration']; ?>"
-        data-max_pax="<?php echo $package['max_pax']; ?>"
-        data-inclusions="<?php echo $package['inclusions']; ?>">Edit</button>
-    <a href="?delete=<?php echo $package['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this package?')" style="margin-top: 10px;">Delete</a>
-            </td>
-        </tr>
-    <?php } ?>
-</tbody>
+                                        if ($total_images > $max_display) {
+                                            echo "<button class='btn btn-link p-0' onclick='openImageViewer(\"{$package['multiple_images']}\")'>Show More</button>";
+                                        }
+                                        ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm edit-package-btn" data-toggle="modal"
+                                        data-target="#editPackageModal" data-id="<?php echo $package['id']; ?>"
+                                        data-package_name="<?php echo $package['package_name']; ?>"
+                                        data-price="<?php echo $package['price']; ?>"
+                                        data-duration="<?php echo $package['duration']; ?>"
+                                        data-max_pax="<?php echo $package['max_pax']; ?>"
+                                        data-inclusions="<?php echo $package['inclusions']; ?>">Edit</button>
+                                    <a href="?delete=<?php echo $package['id']; ?>" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Are you sure you want to delete this package?')"
+                                        style="margin-top: 10px;">Delete</a>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
 
 
 
             </div>
-        
+
             <div class="modal fade" id="imageViewerModal" tabindex="-1" role="dialog"
                 aria-labelledby="imageViewerModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
@@ -356,7 +364,7 @@ $conn->close();
                             </button>
                         </div>
                         <div class="modal-body" id="imageViewerBody">
-                          
+
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -384,9 +392,11 @@ $conn->close();
 
                                 <label for="profile_image">Profile Image:</label>
                                 <input type="file" id="profile_image" name="profile_image" required>
+                                <div id="proof_of_payment_error" class="invalid-feedback"></div>
 
                                 <label for="multiple_images">Multiple Images:</label>
                                 <input type="file" id="multiple_images" name="multiple_images[]" multiple required>
+                                <div id="proof_of_payment_error" class="invalid-feedback"></div>
 
                                 <label for="price">Price:</label>
                                 <input type="number" id="price" name="price" class="form-control" required>
@@ -402,11 +412,11 @@ $conn->close();
 
 
                                 <label for="package_type">Package Type:</label>
-<select id="package_type" name="package_type" class="form-control" required>
-    <option value="Day">Day</option>
-    <option value="Overnight">Overnight</option>
-    <option value="Combo">Combo</option>
-</select>
+                                <select id="package_type" name="package_type" class="form-control" required>
+                                    <option value="Day">Day</option>
+                                    <option value="Overnight">Overnight</option>
+                                    <option value="Combo">Combo</option>
+                                </select>
 
 
                                 <div class="modal-footer">
@@ -419,7 +429,53 @@ $conn->close();
                 </div>
             </div>
 
-            
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Select the file input element
+                    var proofOfPaymentInput = document.getElementById('multiple_images', 'profile_image');
+
+                    // Add an event listener to check the file type when a file is selected
+                    proofOfPaymentInput.addEventListener('change', function () {
+                        var file = this.files[0];
+
+                        // Check if the selected file is an image
+                        if (file.type.indexOf('image') === -1) {
+                            // If not an image, show an error message
+                            this.setCustomValidity('Please upload a valid image file.');
+                            document.getElementById('proof_of_payment_error').textContent = 'Please upload a valid image file.';
+                        } else {
+                            // If it's an image, clear any previous error messages
+                            this.setCustomValidity('');
+                            document.getElementById('proof_of_payment_error').textContent = '';
+                        }
+                    });
+                });
+            </script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Select the file input element
+                    var proofOfPaymentInput = document.getElementById('profile_image');
+
+                    // Add an event listener to check the file type when a file is selected
+                    proofOfPaymentInput.addEventListener('change', function () {
+                        var file = this.files[0];
+
+                        // Check if the selected file is an image
+                        if (file.type.indexOf('image') === -1) {
+                            // If not an image, show an error message
+                            this.setCustomValidity('Please upload a valid image file.');
+                            document.getElementById('proof_of_payment_error').textContent = 'Please upload a valid image file.';
+                        } else {
+                            // If it's an image, clear any previous error messages
+                            this.setCustomValidity('');
+                            document.getElementById('proof_of_payment_error').textContent = '';
+                        }
+                    });
+                });
+            </script>
+
+
             <div class="modal fade" id="editPackageModal" tabindex="-1" role="dialog"
                 aria-labelledby="editPackageModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -441,9 +497,11 @@ $conn->close();
 
                                 <label for="edit_profile_image">Profile Image:</label>
                                 <input type="file" id="edit_profile_image" name="profile_image">
+                                <div id="proof_of_payment_error" class="invalid-feedback"></div>
 
                                 <label for="edit_multiple_images">Multiple Images:</label>
                                 <input type="file" id="edit_multiple_images" name="multiple_images[]" multiple>
+                                <div id="proof_of_payment_error" class="invalid-feedback"></div>
 
                                 <label for="edit_price">Price:</label>
                                 <input type="number" id="edit_price" name="price" class="form-control" required>
@@ -458,12 +516,12 @@ $conn->close();
                                 <textarea id="edit_inclusions" name="inclusions" class="form-control"
                                     required></textarea>
 
-                                    <label for="edit_package_type">Package Type:</label>
-<select id="edit_package_type" name="package_type" class="form-control" required>
-    <option value="Day">Day</option>
-    <option value="Overnight">Overnight</option>
-    <option value="Combo">Combo</option>
-</select>
+                                <label for="edit_package_type">Package Type:</label>
+                                <select id="edit_package_type" name="package_type" class="form-control" required>
+                                    <option value="Day">Day</option>
+                                    <option value="Overnight">Overnight</option>
+                                    <option value="Combo">Combo</option>
+                                </select>
 
 
                                 <div class="modal-footer">
@@ -479,8 +537,52 @@ $conn->close();
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Select the file input element
+            var proofOfPaymentInput = document.getElementById('edit_multiple_images');
+
+            // Add an event listener to check the file type when a file is selected
+            proofOfPaymentInput.addEventListener('change', function () {
+                var file = this.files[0];
+
+                // Check if the selected file is an image
+                if (file.type.indexOf('image') === -1) {
+                    // If not an image, show an error message
+                    this.setCustomValidity('Please upload a valid image file.');
+                    document.getElementById('proof_of_payment_error').textContent = 'Please upload a valid image file.';
+                } else {
+                    // If it's an image, clear any previous error messages
+                    this.setCustomValidity('');
+                    document.getElementById('proof_of_payment_error').textContent = '';
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Select the file input element
+            var proofOfPaymentInput = document.getElementById('edit_profile_image');
+
+            // Add an event listener to check the file type when a file is selected
+            proofOfPaymentInput.addEventListener('change', function () {
+                var file = this.files[0];
+
+                // Check if the selected file is an image
+                if (file.type.indexOf('image') === -1) {
+                    // If not an image, show an error message
+                    this.setCustomValidity('Please upload a valid image file.');
+                    document.getElementById('proof_of_payment_error').textContent = 'Please upload a valid image file.';
+                } else {
+                    // If it's an image, clear any previous error messages
+                    this.setCustomValidity('');
+                    document.getElementById('proof_of_payment_error').textContent = '';
+                }
+            });
+        });
+    </script>
+
     <script>
         $(document).on("click", ".edit-package-btn", function () {
             var id = $(this).data('id');
@@ -508,12 +610,12 @@ $conn->close();
                 var img = document.createElement('img');
                 img.src = image.trim();
                 img.alt = 'Multiple Image';
-                img.style.width = '100%'; 
-                img.style.height = 'auto'; 
+                img.style.width = '100%';
+                img.style.height = 'auto';
                 modalBody.appendChild(img);
             });
 
-            $('#imageViewerModal').modal('show'); 
+            $('#imageViewerModal').modal('show');
         }
     </script>
 
