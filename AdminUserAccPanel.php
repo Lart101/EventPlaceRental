@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create"])) {
                 VALUES ('$username', '$password', '$full_name', '$email', '$date_of_birth', '$gender', '$age', '$contact_number', '$address')";
 
         if ($conn->query($sql) === TRUE) {
-            $message = "New user created successfully";
+            $message = "user registered successfully";
         } else {
             $message = "Error: " . $sql . "<br>" . $conn->error;
         }
