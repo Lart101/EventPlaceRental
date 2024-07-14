@@ -199,56 +199,10 @@ $conn->close();
     }
 
     /* NavBar to Repa */
-
-    .navbar {
-        background-color: whitesmoke;
-
-    }
-
-    .navbar-nav .nav-link {
-        color: black;
-        font-size: 1.1rem;
-    }
-
-    .navbar-nav .nav-item {
-        padding: 0 1rem;
-    }
-
-    .navbar .navbar-nav .nav-item {
-        position: relative;
-    }
-
-    .navbar .navbar-nav .nav-item::after {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        content: '';
-        background-color: black;
-        width: 0%;
-        height: 4px;
-        transition: 500ms;
-    }
-
-    .navbar .navbar-nav .nav-item:hover:after {
-        width: 100%;
-    }
-
-    .nav-item.logout button {
-        color: #dc3545;
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-    }
-
-    .nav-item.logout button:hover {
-        color: #fff;
-        background-color: #dc3545;
-    }
 </style>
 
 <body>
-<?php include 'admin_navbar.php'; ?>
+    <?php include 'admin_navbar.php'; ?>
     <script>
 
 

@@ -97,13 +97,16 @@
         color: #fff;
         background-color: #dc3545;
     }
+    
+       
+   
 </style>
 
 <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-lg">
-            <a class="navbar-brand" href="AdminUserAccPanel.php">
+            <a class="navbar-brand" style=" color: black;">
                 <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
-                Board Mart User Admin
+                Board Mart Admin
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
