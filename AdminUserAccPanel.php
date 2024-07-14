@@ -11,14 +11,14 @@ if (!isset($_SESSION['user_id'])) {
 
 
 
- include 'config.php';
+include 'config.php';
 
 $message = "";
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create"])) {
     $username = $_POST["username"];
-    $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
+    $password = $_POST["password"];
     $full_name = $_POST["full_name"];
     $email = $_POST["email"];
     $date_of_birth = $_POST["date_of_birth"];
@@ -48,7 +48,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create"])) {
         }
     }
 }
-
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
     $id = $_POST["id"];
     $username = $_POST["username"];
@@ -58,13 +57,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
     $gender = $_POST["gender"];
     $contact_number = $_POST["contact_number"];
     $address = $_POST["address"];
-
+    $password = $_POST["password"];
 
     $dob = new DateTime($date_of_birth);
     $now = new DateTime();
     $age = $now->diff($dob)->y;
 
-    $sql = "UPDATE users SET username='$username', full_name='$full_name', email='$email', date_of_birth='$date_of_birth', gender='$gender', age='$age', contact_number='$contact_number', address='$address' WHERE id=$id";
+    // Corrected SQL query string
+    $sql = "UPDATE users SET username='$username', password='$password', full_name='$full_name', email='$email', date_of_birth='$date_of_birth', gender='$gender', age='$age', contact_number='$contact_number', address='$address' WHERE id=$id";
 
     if ($conn->query($sql) === TRUE) {
         $message = "User updated successfully";
@@ -98,114 +98,121 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style2.css">
-    <style>
-        .modal-body form {
-            width: 100%;
-        }
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+</head>
+<link rel="stylesheet" href="style2.css">
+<style>
+    .modal-body form {
+        width: 100%;
+    }
 
-        .modal-body form .form-group {
-            margin-bottom: 15px;
-        }
+    .modal-body form .form-group {
+        margin-bottom: 15px;
+    }
 
-        .table-responsive {
-            overflow-x: auto;
-        }
+    .table-responsive {
+        overflow-x: auto;
+    }
 
-        /* NavBar to Repa */
+    /* NavBar to Repa */
 
-        .navbar {
-            background-color: whitesmoke;
-        }
+    .navbar {
+        background-color: whitesmoke;
+    }
 
-        .navbar-nav .nav-link {
-            color: black;
-            font-size: 1.1rem;
-        }
+    .navbar-nav .nav-link {
+        color: black;
+        font-size: 1.1rem;
+    }
 
-        .navbar-nav .nav-item {
-            padding: 0 1rem;
-        }
+    .navbar-nav .nav-item {
+        padding: 0 1rem;
+    }
 
-        .navbar .navbar-nav .nav-item {
-            position: relative;
-        }
+    .navbar .navbar-nav .nav-item {
+        position: relative;
+    }
 
-        .navbar .navbar-nav .nav-item::after {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            content: '';
-            background-color: black;
-            width: 0%;
-            height: 4px;
-            transition: 500ms;
-        }
+    .navbar .navbar-nav .nav-item::after {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        content: '';
+        background-color: black;
+        width: 0%;
+        height: 4px;
+        transition: 500ms;
+    }
 
-        .navbar .navbar-nav .nav-item:hover:after {
-            width: 100%;
-        }
+    .btn {
+        margin-bottom: 10px;
+    }
 
-        .nav-item.logout button {
-            color: #dc3545;
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-        }
 
-        .nav-item.logout button:hover {
-            color: #fff;
-            background-color: #dc3545;
-        }
-    </style>
+    .navbar .navbar-nav .nav-item:hover:after {
+        width: 100%;
+    }
+
+    .nav-item.logout button {
+        color: #dc3545;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .nav-item.logout button:hover {
+        color: #fff;
+        background-color: #dc3545;
+    }
+</style>
 </head>
 
 <body>
-<?php include 'admin_navbar.php'; ?>
-        <div class="container-lg">
-            <a class="navbar-brand" href="AdminUserAccPanel.php">
-                <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
-                Board Mart User Admin
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="mx-auto">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin_package.php">Package</a>
+    <?php include 'admin_navbar.php'; ?>
+    <div class="container-lg">
+        <a class="navbar-brand" href="AdminUserAccPanel.php">
+            <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            Board Mart User Admin
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="mx-auto">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin_package.php">Package</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin_reservations.php">Reservation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="AdminUserAccPanel.php">User</a>
+                    </li>
+                    <?php
+
+                    if (!isset($_SESSION['user_id'])):
+                        ?>
+
+                        <li class="nav-item login">
+                            <a class="nav-link" href="login.php">Login</a>
                         </li>
+                    <?php else: ?>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin_reservations.php">Reservation</a>
+                        <li class="nav-item logout">
+                            <form action="logout.php" method="POST">
+                                <button type="submit" class="nav-link btn btn-link"
+                                    onclick="return confirmLogout()">Logout</button>
+                            </form>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="AdminUserAccPanel.php">User</a>
-                        </li>
-                        <?php
-
-                        if (!isset($_SESSION['user_id'])):
-                            ?>
-
-                            <li class="nav-item login">
-                                <a class="nav-link" href="login.php">Login</a>
-                            </li>
-                        <?php else: ?>
-
-                            <li class="nav-item logout">
-                                <form action="logout.php" method="POST">
-                                    <button type="submit" class="nav-link btn btn-link"
-                                        onclick="return confirmLogout()">Logout</button>
-                                </form>
-                            </li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
+                    <?php endif; ?>
+                </ul>
             </div>
         </div>
+    </div>
     </nav>
     <script>
 
@@ -243,6 +250,7 @@ $conn->close();
                                 <th>ID</th>
                                 <th>Username</th>
                                 <th>Full Name</th>
+                                <th>Password</th>
                                 <th>Email</th>
                                 <th>Date of Birth</th>
                                 <th>Gender</th>
@@ -258,6 +266,7 @@ $conn->close();
                                     <td><?php echo $user['id']; ?></td>
                                     <td><?php echo $user['username']; ?></td>
                                     <td><?php echo $user['full_name']; ?></td>
+                                    <td><?php echo $user['password']; ?></td>
                                     <td><?php echo $user['email']; ?></td>
                                     <td><?php echo $user['date_of_birth']; ?></td>
                                     <td><?php echo $user['gender']; ?></td>
@@ -265,16 +274,18 @@ $conn->close();
                                     <td><?php echo $user['contact_number']; ?></td>
                                     <td><?php echo $user['address']; ?></td>
                                     <td>
-                                        <a href="#" class="edit-user" data-id="<?php echo $user['id']; ?>"
+                                        <a href="#" class="edit-user btn btn-primary" data-id="<?php echo $user['id']; ?>"
                                             data-username="<?php echo $user['username']; ?>"
                                             data-full_name="<?php echo $user['full_name']; ?>"
+                                            data-password="<?php echo $user['password']; ?>"
                                             data-email="<?php echo $user['email']; ?>"
                                             data-date_of_birth="<?php echo $user['date_of_birth']; ?>"
                                             data-gender="<?php echo $user['gender']; ?>"
                                             data-contact_number="<?php echo $user['contact_number']; ?>"
                                             data-address="<?php echo $user['address']; ?>" data-toggle="modal"
                                             data-target="#editUserModal">Edit</a>
-                                        <a href="#" class="delete-user" data-id="<?php echo $user['id']; ?>">Delete</a>
+                                        <a href="#" class="delete-user btn btn-danger btn-sm"
+                                            data-id="<?php echo $user['id']; ?>">Delete</a>
                                     </td>
                                 </tr>
                             <?php } ?>
@@ -305,23 +316,39 @@ $conn->close();
 
                                 <div class="form-group">
                                     <label for="password">Password:</label>
-                                    <input type="password" id="password" name="password" class="form-control" required>
+                                    <input type="password" id="password" name="password" class="form-control"
+                                            pattern="^(?=.*[a-z])(?=.*[A-Z]).{6,}$"
+                                            title="Password must contain at least one uppercase letter, one lowercase letter, and be at least 6 characters long."
+                                            required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="confirm_password">Confirm Password:</label>
+                                    <input type="password" id="confirm_password" name="confirm_password"
+                                        class="form-control" required>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="full_name">Full Name:</label>
-                                    <input type="text" id="full_name" name="full_name" class="form-control" required>
+                                    <input type="text" id="full_name" name="full_name" class="form-control" required
+                                    pattern="[A-Za-z\s]+" title="Please enter letters only">
                                 </div>
 
                                 <div class="form-group">
                                     <label for="email">Email:</label>
-                                    <input type="email" id="email" name="email" class="form-control" required>
+                                    <input type="email" id="email" name="email" class="form-control" required
+                                        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                                        title="Please enter a valid email address containing at least '.' or '@'"
+                                        oninput="validateEmail(this)">
                                 </div>
+                                
 
                                 <div class="form-group">
                                     <label for="date_of_birth">Date of Birth:</label>
-                                    <input type="date" id="date_of_birth" name="date_of_birth" class="form-control"
-                                        required onchange="calculateAge('createUserForm', 'date_of_birth', 'age')">
+                                     <input type="date" id="date_of_birth" name="date_of_birth" class="form-control"
+                                        required max="<?php echo date('Y-m-d', strtotime('-18 years')); ?>"
+                                        onchange="calculateAge('editUserForm', 'editDateOfBirth', 'editAge')"
+                                        title="Must be at least 18 years old.">
                                 </div>
 
                                 <div class="form-group">
@@ -335,8 +362,9 @@ $conn->close();
 
                                 <div class="form-group">
                                     <label for="contact_number">Contact Number:</label>
-                                    <input type="tel" id="contact_number" name="contact_number" class="form-control"
-                                        required>
+                                     <input type="tel" id="contact_number" name="contact_number" class="form-control"
+                                        required pattern="[0-9]{10}"
+                                        title="Please enter exactly 10 digits and Numbers Only">
                                 </div>
 
                                 <div class="form-group">
@@ -355,6 +383,7 @@ $conn->close();
                     </div>
                 </div>
             </div>
+
 
             <!-- Edit User Modal -->
             <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel"
@@ -379,18 +408,40 @@ $conn->close();
 
                                 <div class="form-group">
                                     <label for="editFullName">Full Name:</label>
-                                    <input type="text" id="editFullName" name="full_name" class="form-control" required>
+                                    <input type="text" id="editFullName" name="full_name" class="form-control" required
+                                        pattern="[A-Za-z\s]+" title="Please enter letters only">
+
                                 </div>
+
 
                                 <div class="form-group">
                                     <label for="editEmail">Email:</label>
-                                    <input type="email" id="editEmail" name="email" class="form-control" required>
+                                    <input type="email" id="editEmail" name="email" class="form-control" required
+                                        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                                        title="Please enter a valid email address containing at least '.' or '@'"
+                                        oninput="validateEmail(this)">
+
                                 </div>
+
+                                <script>
+                                    function validateEmail(input) {
+
+                                        if (!input.value.includes('.') && !input.value.includes('@')) {
+                                            input.setCustomValidity("Please enter a valid email address containing at least '.' or '@'");
+                                        } else {
+                                            input.setCustomValidity("");
+                                        }
+                                    }
+                                </script>
+
 
                                 <div class="form-group">
                                     <label for="editDateOfBirth">Date of Birth:</label>
                                     <input type="date" id="editDateOfBirth" name="date_of_birth" class="form-control"
-                                        required onchange="calculateAge('editUserForm', 'editDateOfBirth', 'editAge')">
+                                        required max="<?php echo date('Y-m-d', strtotime('-18 years')); ?>"
+                                        onchange="calculateAge('editUserForm', 'editDateOfBirth', 'editAge')"
+                                        title="Must be at least 18 years old.">
+
                                 </div>
 
                                 <div class="form-group">
@@ -403,34 +454,132 @@ $conn->close();
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="editContactNumber">Contact Number:</label>
+                                    <label for="editContactNumber">Contact Number: (+63)</label>
                                     <input type="tel" id="editContactNumber" name="contact_number" class="form-control"
-                                        required>
+                                        required pattern="[0-9]{10}"
+                                        title="Please enter exactly 10 digits and Numbers Only">
+
                                 </div>
+
 
                                 <div class="form-group">
                                     <label for="editAddress">Address:</label>
                                     <textarea id="editAddress" name="address" class="form-control" required></textarea>
                                 </div>
 
+                                <div class="form-group">
+                                    <label for="editPassword">New Password:</label>
+                                    <div class="input-group">
+                                        <input type="password" id="editPassword" name="password" class="form-control"
+                                            pattern="^(?=.*[a-z])(?=.*[A-Z]).{6,}$"
+                                            title="Password must contain at least one uppercase letter, one lowercase letter, and be at least 6 characters long."
+                                            required>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                id="toggleEditPassword">
+                                                <i id="toggleEditIcon" class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+                               
+                                    <label for="editConfirmPassword">Confirm New Password:</label>
+                                    <div class="input-group">
+                                    <input type="password" id="editConfirmPassword" name="confirm_password"
+                                        class="form-control" required>
+                                        <button class="btn btn-outline-secondary" type="button"
+                                                id="toggleEditConfirmPassword">
+                                                <i id="toggleEditIcon" class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                </div>
+
                                 <input type="hidden" id="editAge" name="age">
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    <button type="submit" class="btn btn-primary" >Save Changes</button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
+    <script>
+   
+    function comparePasswords(event) {
+        var password = document.getElementById("editPassword").value;
+        var confirmPassword = document.getElementById("editConfirmPassword").value;
+
+        if (password !== confirmPassword) {
+            
+            alert("Passwords do not match!");
+            event.preventDefault(); 
+        }
+      
+    }
+
+  
+    document.getElementById("editUserModal").addEventListener("submit", comparePasswords);
+</script>
+<script>
+   
+   function comparePasswords(event) {
+       var password = document.getElementById("password").value;
+       var confirmPassword = document.getElementById("confirm_password").value;
+
+       if (password !== confirmPassword) {
+           
+           alert("Passwords do not match!");
+           event.preventDefault(); 
+       }
+     
+   }
+
+ 
+   document.getElementById("createUserForm").addEventListener("submit", comparePasswords);
+</script>
+
+
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+    <script>
+
+        $('#toggleEditPassword').on('click', function () {
+            var passwordField = $('#editPassword');
+            var icon = $('#toggleEditIcon');
+
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fas fa-eye').addClass('fas fa-eye-slash');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fas fa-eye-slash').addClass('fas fa-eye');
+            }
+        });
+      
+         $('#toggleEditConfirmPassword').on('click', function () {
+            var passwordField = $('#editConfirmPassword');
+            var icon = $('#toggleEditIcon');
+
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fas fa-eye').addClass('fas fa-eye-slash');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fas fa-eye-slash').addClass('fas fa-eye');
+            }
+        });
+    </script>
     <script>
         function calculateAge(formId, dobId, ageId) {
             var dob = document.getElementById(dobId).value;
@@ -455,6 +604,7 @@ $conn->close();
                 var gender = $(this).data('gender');
                 var contact_number = $(this).data('contact_number');
                 var address = $(this).data('address');
+                var password = $(this).data('password');
 
                 $('#editUserId').val(id);
                 $('#editUsername').val(username);
@@ -464,6 +614,9 @@ $conn->close();
                 $('#editGender').val(gender);
                 $('#editContactNumber').val(contact_number);
                 $('#editAddress').val(address);
+                $('#editPassword').val(password);
+                $('#editConfirmPassword').val(password);
+
 
                 // Calculate age
                 calculateAge('editUserForm', 'editDateOfBirth', 'editAge');
@@ -492,7 +645,7 @@ $conn->close();
             });
         });
     </script>
-  
+
 </body>
 
 </html>
