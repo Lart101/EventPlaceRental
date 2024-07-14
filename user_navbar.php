@@ -1,7 +1,6 @@
 <?php 
 
 require 'config.php'; 
-
 $username = 'Guest';
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
@@ -21,7 +20,9 @@ if (isset($_SESSION['user_id'])) {
     $stmt->close();
 }
 
+
 $conn->close();
+
 ?>
 
 <style>
@@ -82,6 +83,7 @@ $conn->close();
         background-color: #dc3545;
     }
 </style>
+
 <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container-lg">
         <a class="navbar-brand" href="index.html">
@@ -99,6 +101,9 @@ $conn->close();
                         <a class="nav-link" href="index1.php">Home</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="aboutus.php">About Us</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="swimming_packages.php">Packages</a>
                     </li>
                    
@@ -114,6 +119,8 @@ $conn->close();
                             <li><a class="dropdown-item" href="reviews.php">Customer Reviews</a></li>
                             <li><a class="dropdown-item" href="support.php">Support</a></li>
                             <li><a class="dropdown-item" href="career.php">Career</a></li>
+                            <li><a class="dropdown-item" href="gallery.php">Gallery</a></li>
+                            <li><a class="dropdown-item" href="ameneties.php">Amenities</a></li>
                             <li><a class="dropdown-item" href="contactmain.php">Contact</a></li>
                             
                            
@@ -131,7 +138,7 @@ $conn->close();
                             </form>
                         </li>
                         <li class="nav-item">
-                            <span class="nav-link">Welcome, <?php echo htmlspecialchars($username); ?>!</span>
+                            <span class="nav-link" >Welcome, <?php echo htmlspecialchars($username); ?>!</span>
                         </li>
                     <?php endif; ?>
                 </ul>

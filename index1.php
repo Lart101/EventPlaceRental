@@ -1,7 +1,5 @@
 
-<?php 
-  session_start();
-?>
+<?php session_start()?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -286,7 +284,7 @@ section.hero img{
             padding: 20px;
             padding-top: 20%;
             color: whitesmoke;
-            height: 600px;
+            height: 800px;
         }
     </style>
 </head>

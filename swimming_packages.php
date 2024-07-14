@@ -24,7 +24,7 @@ if (!isset($_SESSION['user_id'])) {
             padding: 20px;
             padding-top: 20%;
             color: whitesmoke;
-            height: 600px;
+            height: 800px;
         }
         .card {
             margin-bottom: 20px;
@@ -55,6 +55,7 @@ if (!isset($_SESSION['user_id'])) {
                 <div class="col-sm-6 fade-in">
                     <h1 class="display fw-bold" style="color: #FFFAB7;">Swimming Packages</h1>
                     <p>Choose your preferred swimming package!</p>
+                    <a class="btn btn-outline-light btn-lg" href="#nature-of-business">Reserve Now</a>
                 </div>
             </div>
         </div>
