@@ -73,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $insert_stmt->bind_param("ssssssiss", $username, $password, $full_name, $email, $date_of_birth, $gender, $age, $contact_number, $address);
 
             if ($insert_stmt->execute()) {
-                $message = "New record created successfully";
+                $message = "User registered successfully";
 
                 $username = $password = $first_name = $middle_name = $last_name = $email = $date_of_birth = $gender = $contact_number = $barangay = $city = $blk = "";
             } else {
