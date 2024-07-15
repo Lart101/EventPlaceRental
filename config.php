@@ -1,5 +1,6 @@
 <?php
 $servername = "localhost";
+$host = "localhost";
 $username = "root";
 $password = "";
 $dbname = "event_store";
