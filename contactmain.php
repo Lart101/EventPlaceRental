@@ -170,10 +170,11 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
         <div class="row justify-content-center mt-5">
             <div class="col-md-8 col-lg-6 mb-4">
                 <form id="contact-form" action="contact.php" method="POST">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required pattern="[A-Za-z]+" title="Please enter letters only">
-                    </div>
+                <div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" class="form-control" id="name" name="name" required pattern="[A-Za-z ]+" title="Please enter letters and spaces only">
+</div>
+
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email" required>
