@@ -157,7 +157,7 @@ if (!empty($errorMsg)): ?>
 
         <div class="card mt-4">
             <div class="card-body">
-                <form action="insert_reservation.php" method="POST" enctype="multipart/form-data">
+                <form action="insert_reservation.php" method="POST" enctype="multipart/form-data" id="showinfoform">
                     <input type="hidden" name="package_id" value="<?php echo htmlspecialchars($packageId); ?>">
                     <input type="hidden" name="reservationFee" value="<?php echo htmlspecialchars($reservationFee); ?>">
                     <input type="hidden" name="package_name" value="<?php echo htmlspecialchars($packageName); ?>">
@@ -185,11 +185,35 @@ if (!empty($errorMsg)): ?>
                     </div>
 
                     <div class="mb-3">
-    <label for="proof_of_payment" class="form-label">Upload Proof of Payment</label>
+    <label for="proof_of_payment" class="form-label">Upload Proof of Payment (Max 1MB)</label>
     <input type="file" class="form-control" id="proof_of_payment" name="proof_of_payment" accept="image/*" required>
     <div id="proof_of_payment_error" class="invalid-feedback"></div>
 </div>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var form = document.getElementById("showinfoform"); // Get the form by ID
+
+    form.addEventListener("submit", function(event) {
+        var fileInput = document.getElementById("proof_of_payment");
+        if (fileInput.files.length > 0) {
+            var fileSize = fileInput.files[0].size; // Size in bytes
+
+            // Convert to megabytes (MB)
+            var maxSizeMB = 1;
+            var maxSizeBytes = maxSizeMB * 1024 * 1024;
+
+            if (fileSize > maxSizeBytes) {
+                event.preventDefault(); // Prevent form submission
+                var errorElement = document.getElementById("proof_of_payment_error");
+                errorElement.textContent = "File size exceeds 1MB. Please choose a smaller file.";
+                errorElement.classList.add("invalid-feedback");
+                fileInput.classList.add("is-invalid");
+            }
+        }
+    });
+});
+</script>
 
                     <div class="mb-3">
                         <input type="checkbox" id="terms" name="terms" required>

@@ -60,8 +60,10 @@ if (!isset($_SESSION['user_id'])) {
 <?php include 'user_navbar.php'; ?>
     <div class="container">
         <div class="card" style="margin-bottom:10%;">
-        <p class="card-text">Thank you for making a reservation with us.</p>
-            <p>A confirmation email with the receipt has been sent to your provided email address, if valid.</p>
+            <h1 class="card-title">Reservation Successful!</h1>
+            
+            <p class="card-text">Thank you for making a reservation with us.</p>
+            <p>A receipt has been sent to your provided email address, if valid.</p>
             <p>You can view your reservation details in <a href="profilecopy.php">Profile</a>.</p>
             <a href="index1.php" class="btn btn-lg btn-primary btn-back">Back to Home</a>
         </div>
