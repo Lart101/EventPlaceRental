@@ -235,7 +235,7 @@ $conn->close();
                 <div class="search-create-container row mb-3">
                     <div class="search-container col-md-8 d-flex">
                         <input type="text" id="searchInput" class="form-control mr-2" placeholder="Search for users...">
-                        <button type="button" id="searchButton" class="btn btn-primary btn-custom-large">Search</button>
+                       
                     </div>
                     <div class="col-md-4 d-flex justify-content-end">
                         <button type="button" class="btn btn-success btn-custom-large" data-toggle="modal"
@@ -262,7 +262,8 @@ $conn->close();
                         </thead>
                         <tbody>
                             <?php while ($user = $users->fetch_assoc()) { ?>
-                                <tr>
+                                <tr data-username="<?php echo strtolower($user['username']); ?>" >
+                                    
                                     <td><?php echo $user['id']; ?></td>
                                     <td><?php echo $user['username']; ?></td>
                                     <td><?php echo $user['full_name']; ?></td>
@@ -293,6 +294,28 @@ $conn->close();
                     </table>
                 </div>
             </div>
+            <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const userTable = document.getElementById('userTable');
+    const packageRows = userTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+    searchInput.addEventListener('keyup', function () {
+        const searchTerm = searchInput.value.toLowerCase();
+
+        Array.from(packageRows).forEach(function (row) {
+            const userName= row.getAttribute('data-username');
+          
+
+            if ( userName.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
 
             <!-- Create User Modal -->
             <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog"

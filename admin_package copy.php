@@ -229,13 +229,11 @@ $conn->close();
 
             <div class="package-list">
                 <div class="search-create-container row mb-3">
-
                     <div class="search-container col-md-8 d-flex">
                         <input type="text" id="searchInput" class="form-control mr-2"
                             placeholder="Search for packages...">
-                       
+                        <button type="button" id="searchButton" class="btn btn-primary btn-custom-large">Search</button>
                     </div>
-                    
                     <div class="col-md-4 d-flex justify-content-end">
                         <button type="button" class="btn btn-success btn-custom-large" data-toggle="modal"
                             data-target="#createPackageModal">Create Package</button>
@@ -258,86 +256,54 @@ $conn->close();
                         </tr>
                     </thead>
                     <tbody>
-    <?php while ($package = $swimming_packages->fetch_assoc()) { ?>
-        <tr data-package-name="<?php echo strtolower($package['package_name']); ?>" 
-            data-package-type="<?php echo strtolower($package['package_type']); ?>" 
-            data-price="<?php echo strtolower($package['price']); ?>" 
-            data-duration="<?php echo strtolower($package['duration']); ?>" 
-            data-max-pax="<?php echo strtolower($package['max_pax']); ?>" 
-            data-inclusions="<?php echo strtolower($package['inclusions']); ?>">
-            <td><?php echo $package['id']; ?></td>
-            <td><?php echo $package['package_name']; ?></td>
-            <td><?php echo $package['package_type']; ?></td>
-            <td><?php echo $package['price']; ?></td>
-            <td><?php echo $package['duration']; ?></td>
-            <td><?php echo $package['max_pax']; ?></td>
-            <td><?php echo $package['inclusions']; ?></td>
-            <td>
-                <img src="<?php echo $package['profile_image']; ?>" alt="Profile Image"
-                     style="width: 100px; height: 100px; cursor: pointer;"
-                     onclick="openImageViewer('<?php echo $package['multiple_images']; ?>')">
-            </td>
-            <td>
-                <div class="collage">
-                    <?php
-                    $images = explode(',', $package['multiple_images']);
-                    $total_images = count($images);
-                    $max_display = 2;
+                        <?php while ($package = $swimming_packages->fetch_assoc()) { ?>
+                            <tr>
+                                <td><?php echo $package['id']; ?></td>
+                                <td><?php echo $package['package_name']; ?></td>
+                                <td><?php echo $package['package_type']; ?></td>
+                                <td><?php echo $package['price']; ?></td>
+                                <td><?php echo $package['duration']; ?></td>
+                                <td><?php echo $package['max_pax']; ?></td>
+                                <td><?php echo $package['inclusions']; ?></td>
+                                <td>
+                                    <img src="<?php echo $package['profile_image']; ?>" alt="Profile Image"
+                                        style="width: 100px; height: 100px; cursor: pointer;"
+                                        onclick="openImageViewer('<?php echo $package['multiple_images']; ?>')">
+                                </td>
+                                <td>
+                                    <div class="collage">
+                                        <?php
+                                        $images = explode(',', $package['multiple_images']);
+                                        $total_images = count($images);
+                                        $max_display = 2;
 
-                    foreach (array_slice($images, 0, min($max_display, $total_images)) as $image) {
-                        echo "<img src='$image' alt='Multiple Image' style='width: 100px; height: 100px; margin-right: 5px; cursor: pointer;' onclick='openImageViewer(\"{$package['multiple_images']}\")'>";
-                    }
+                                        foreach (array_slice($images, 0, min($max_display, $total_images)) as $image) {
+                                            echo "<img src='$image' alt='Multiple Image' style='width: 100px; height: 100px; margin-right: 5px; cursor: pointer;' onclick='openImageViewer(\"{$package['multiple_images']}\")'>";
+                                        }
 
-                    if ($total_images > $max_display) {
-                        echo "<button class='btn btn-link p-0' onclick='openImageViewer(\"{$package['multiple_images']}\")'>Show More</button>";
-                    }
-                    ?>
-                </div>
-            </td>
-            <td>
-                <button class="btn btn-primary btn-sm edit-package-btn" data-toggle="modal"
-                        data-target="#editPackageModal" data-id="<?php echo $package['id']; ?>"
-                        data-package_name="<?php echo $package['package_name']; ?>"
-                        data-price="<?php echo $package['price']; ?>"
-                        data-duration="<?php echo $package['duration']; ?>"
-                        data-max_pax="<?php echo $package['max_pax']; ?>"
-                        data-inclusions="<?php echo $package['inclusions']; ?>">Edit</button>
-                <a href="?delete=<?php echo $package['id']; ?>" class="btn btn-danger btn-sm"
-                   onclick="return confirm('Are you sure you want to delete this package?')"
-                   style="margin-top: 10px;">Delete</a>
-            </td>
-        </tr>
-    <?php } ?>
-</tbody>
+                                        if ($total_images > $max_display) {
+                                            echo "<button class='btn btn-link p-0' onclick='openImageViewer(\"{$package['multiple_images']}\")'>Show More</button>";
+                                        }
+                                        ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm edit-package-btn" data-toggle="modal"
+                                        data-target="#editPackageModal" data-id="<?php echo $package['id']; ?>"
+                                        data-package_name="<?php echo $package['package_name']; ?>"
+                                        data-price="<?php echo $package['price']; ?>"
+                                        data-duration="<?php echo $package['duration']; ?>"
+                                        data-max_pax="<?php echo $package['max_pax']; ?>"
+                                        data-inclusions="<?php echo $package['inclusions']; ?>">Edit</button>
+                                    <a href="?delete=<?php echo $package['id']; ?>" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Are you sure you want to delete this package?')"
+                                        style="margin-top: 10px;">Delete</a>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
 
 
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('searchInput');
-    const packageTable = document.getElementById('packageTable');
-    const packageRows = packageTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-
-    searchInput.addEventListener('keyup', function () {
-        const searchTerm = searchInput.value.toLowerCase();
-
-        Array.from(packageRows).forEach(function (row) {
-            const packageName = row.getAttribute('data-package-name');
-            const packageType = row.getAttribute('data-package-type');
-            const price = row.getAttribute('data-price');
-            const duration = row.getAttribute('data-duration');
-            const maxPax = row.getAttribute('data-max-pax');
-           
-
-            if (packageName.includes(searchTerm) ) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    });
-});
-</script>
 
             </div>
 
