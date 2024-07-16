@@ -77,7 +77,7 @@ $conn->close();
 </style>
 <body>
     <?php include 'admin_navbar.php'; ?>
-    <div class="container">
+    <div class="container" style="margin-top:5%;">
         <h1 class="text-center mb-4">Report Summary</h1>
         <div class="row">
             <div class="col-md-6">

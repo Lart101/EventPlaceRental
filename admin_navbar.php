@@ -1,5 +1,35 @@
+<?php require 'config.php';
+
+$username = '';
+
+// Check if admin_id is set in session
+if (!isset($_SESSION['admin_id'])) {
+    header('Location: login.php');
+    exit();
+}
 
 
+$sql = "SELECT username FROM adminaccount WHERE id = ?";
+$stmt = $conn->prepare($sql);
+
+if ($stmt) {
+    
+    $stmt->bind_param("i", $_SESSION['admin_id']);
+
+   
+    $stmt->execute();
+
+    
+    $stmt->bind_result($username);
+
+   
+    $stmt->fetch();
+
+   
+    $stmt->close();
+}
+
+?>
 <style>
     .collage {
         display: flex;
@@ -146,6 +176,9 @@
                                         onclick="return confirmLogout()">Logout</button>
                                 </form>
                             </li>
+                            <li class="nav-item">
+                    <span class="nav-link">Welcome, <?php echo htmlspecialchars($username); ?>!</span>
+                </li>
                         <?php endif; ?>
                     </ul>
                 </div>

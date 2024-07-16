@@ -168,8 +168,6 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
             cursor: pointer;
         }
 
-
-
         .btn-cancel:hover {
             text-decoration: underline;
         }
@@ -295,66 +293,61 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
     <?php
     // Function to display reservations based on status
-    // Function to display reservations based on status
-function displayReservationsByStatus($reservations, $status)
-{
-    echo '<div class="mt-3">';
+    function displayReservationsByStatus($reservations, $status)
+    {
+        echo '<div class="mt-3">';
 
-    if (!empty($reservations)) {
-        foreach ($reservations as $reservation) {
-            if ($reservation['status'] === $status) {
-                echo '<div class="reservation-card">';
-                echo '<div class="reservation-details">';
-                echo '<h5><strong>' . htmlspecialchars($reservation['package_name']) . '</strong></h5>';
-                echo '<p><strong>Date:</strong> ' . date('M d, Y', strtotime($reservation['start_date'])) . ' to ' . date('M d, Y', strtotime($reservation['end_date'])) . '</p>';
-                echo '<p><strong>Total Price:</strong> ₱' . htmlspecialchars($reservation['total_price']) . '</p>';
-                echo '<p><strong>Status:</strong> ';
+        if (!empty($reservations)) {
+            foreach ($reservations as $reservation) {
+                if ($reservation['status'] === $status) {
+                    echo '<div class="reservation-card">';
+                    echo '<div class="reservation-details">';
+                    echo '<h5><strong>' . htmlspecialchars($reservation['package_name']) . '</strong></h5>';
+                    echo '<p><strong>Date:</strong> ' . date('M d, Y', strtotime($reservation['start_date'])) . ' to ' . date('M d, Y', strtotime($reservation['end_date'])) . '</p>';
+                    echo '<p><strong>Total Price:</strong> ₱' . htmlspecialchars($reservation['total_price']) . '</p>';
+                    echo '<p><strong>Status:</strong> ';
 
-                switch ($status) {
-                    case 'Pending':
-                        echo '<span class="badge bg-primary">' . $status . '</span>';
-                        break;
-                    case 'Accepted':
-                        echo '<span class="badge bg-success">' . $status . '</span>';
-                        break;
-                    case 'Denied':
-                    case 'Cancelled':
-                        echo '<span class="badge bg-danger">' . $status . '</span>';
-                        break;
-                    default:
-                        echo '<span class="badge bg-secondary">' . $status . '</span>';
-                        break;
+                    switch ($status) {
+                        case 'Pending':
+                            echo '<span class="badge bg-primary">' . $status . '</span>';
+                            break;
+                        case 'Accepted':
+                            echo '<span class="badge bg-success">' . $status . '</span>';
+                            break;
+                        case 'Denied':
+                        case 'Cancelled':
+                            echo '<span class="badge bg-danger">' . $status . '</span>';
+                            break;
+                        default:
+                            echo '<span class="badge bg-secondary">' . $status . '</span>';
+                            break;
+                    }
+
+                    echo '</p>';
+
+                    // Check if reservation is not Cancelled or Denied to show cancellation button
+                    if ($reservation['status'] !== 'Cancelled' && $reservation['status'] !== 'Denied') {
+                        echo '<form action="profilecopy.php" method="POST" onsubmit="return confirmCancellation();">';
+                        echo '<input type="hidden" name="reservation_id" value="' . $reservation['id'] . '">';
+                        echo '<button type="submit" class="btn btn-danger" name="cancel_reservation">Cancel Reservation</button>';
+                        echo '</form>';
+                    } else {
+                        echo '<button type="button" class="btn btn-secondary" disabled>Cancelled</button>';
+                    }
+
+                    echo '</div></div>';
                 }
-
-                echo '</p>';
-
-                // Check if reservation is not Cancelled or Denied to show cancellation button
-                if ($reservation['status'] !== 'Cancelled' && $reservation['status'] !== 'Denied') {
-                    echo '<form action="profilecopy.php" method="POST" onsubmit="return confirmCancellation();">';
-                    echo '<input type="hidden" name="reservation_id" value="' . $reservation['id'] . '">';
-                    echo '<button type="submit" class="btn btn-danger" name="cancel_reservation">Cancel Reservation</button>';
-                    echo '</form>';
-                } else {
-                    echo '<button type="button" class="btn btn-secondary" disabled>Cancelled</button>';
-                }
-
-                // View button to see detailed reservation information
-                echo '<a href="view_reservation.php?id=' . $reservation['id'] . '" class="btn btn-primary"style="margin: 10px;" >View</a>';
-
-                echo '</div></div>';
             }
+        } else {
+            echo '<div class="reservation-card">';
+            echo '<div class="reservation-details text-center">';
+            echo '<h5 class="text-danger">No ' . strtolower($status) . ' reservations found</h5>';
+            echo '<p class="text-muted">You have no ' . strtolower($status) . ' reservations.</p>';
+            echo '</div></div>';
         }
-    } else {
-        echo '<div class="reservation-card">';
-        echo '<div class="reservation-details text-center">';
-        echo '<h5 class="text-danger">No ' . strtolower($status) . ' reservations found</h5>';
-        echo '<p class="text-muted">You have no ' . strtolower($status) . ' reservations.</p>';
-        echo '</div></div>';
+
+        echo '</div>';
     }
-
-    echo '</div>';
-}
-
     ?>
     <script>
         function confirmCancellation() {

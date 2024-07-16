@@ -137,6 +137,8 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
                     <ul class="list-unstyled">
                         <li><i class="bi bi-geo-alt-fill"></i> <strong>Location:</strong>BoardMart’s Event Place, 1043 Mendoza, Valenzuela, Metro Manila</li>
                         <li><i class="bi bi-envelope-fill"></i> <strong>Email:</strong> boardmarteventplace@yahoo.com</li>
+                        <li><i class="bi bi-person-lines-fill"></i> <strong>Contact Number:(Globe)</strong> +63 915 528 5651</li>
+
                     </ul>
                     <div class="mt-4">
                         <h3>Follow Us on:</h3>
@@ -222,35 +224,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
 
 
-    <footer class="footer mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12 text-center">
-                    <p>&copy; 2024 Board Mart Event Place. All Rights Reserved.</p>
-                    <div class="mt-4">
-                        <h3>Follow Us on:</h3>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <a href="https://www.facebook.com/BoardMartsEventPlace" target="_blank">
-                                    <i class="bi bi-facebook" style="font-size: 1rem; margin-right: 10px;"></i>
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="https://www.instagram.com/boardmarseventplace" target="_blank">
-                                    <i class="bi bi-instagram" style="font-size: 1rem; margin-right: 10px;"></i>
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="https://x.com/Boardmart" target="_blank">
-                                    <i class="bi bi-twitter" style="font-size: 1rem; margin-right: 10px;"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <?php require 'footer.php' ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>

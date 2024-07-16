@@ -13,15 +13,17 @@
             text-decoration: none;
             color: #ffc107;
         }
+        
 </style>
 
 <footer class="footer mt-5">
         <div class="container">
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <p>&copy; 2024 Board Mart Event Place. All Rights Reserved.</p>
+                    <h6>&copy; 2024 Board Mart Event Place. All Rights Reserved.</h6>
+                    <h7> <i class="bi bi-person-lines-fill"></i> <strong>Contact Number:(Globe)</strong> +63 915 528 5651</h7>
                     <div class="mt-4">
-                        <h3>Follow Us on:</h3>
+                        <h5>Follow Us on:</h5>
                         <ul class="list-inline">
                             <li class="list-inline-item">
                                 <a href="https://www.facebook.com/BoardMartsEventPlace" target="_blank">
@@ -39,6 +41,7 @@
                                 </a>
                             </li>
                         </ul>
+                      
                     </div>
                 </div>
             </div>
