@@ -1,11 +1,11 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user_id'])) {
+// Check if admin is not logged in
+if (!isset($_SESSION['admin_id'])) {
     header('Location: login.php');
     exit();
 }
-
 
 require 'config.php';
 

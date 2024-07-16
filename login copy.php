@@ -5,9 +5,6 @@ session_start();
 if (isset($_SESSION['user_id'])) {
     header('Location: swimming_packages.php');
     exit();
-}if (isset($_SESSION['is_admin'])) {
-    header('Location: admin_package.php');
-    exit();
 }
 
 // Database connection
@@ -23,45 +20,40 @@ $error = '';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
-    $isAdmin = isset($_POST['is_admin']);
 
-    if ($isAdmin) {
-        // Check admin credentials
-        $sql = "SELECT id, password FROM adminaccount WHERE username = ?";
-    } else {
-        // Check regular user credentials
-        $sql = "SELECT id, password FROM users WHERE username = ?";
+    // Define the admin credentials
+    $adminUsername = "@@@@@";
+    $adminPassword = "@@@@@";
+
+    // Check if the entered credentials are admin credentials
+    if ($username === $adminUsername && $password === $adminPassword) {
+        // Redirect to admin_package.php upon successful admin login
+        $_SESSION['user_id'] = 'admin'; // Just a placeholder for admin login
+        header('Location: admin_package.php');
+        exit();
     }
-    
+
+    // Perform regular user login check
+    $sql = "SELECT id, password FROM users WHERE username = ?";
     $stmt = $conn->prepare($sql);
     if ($stmt) {
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $stmt->bind_result($userId, $storedPassword);
-    
-        if ($stmt->fetch()) {
-            // Compare the entered password with the stored password (plaintext comparison)
-            if ($password === $storedPassword) {
-                if ($isAdmin) {
-                    $_SESSION['admin_id'] = $userId;
-                    header('Location: admin_package.php');
-                } else {
-                    $_SESSION['user_id'] = $userId;
-                    header('Location: swimming_packages.php');
-                }
-                exit();
-            } else {
-                $error = "Invalid username or password.";
-            }
+        $stmt->fetch();
+
+        if ($password === $storedPassword) {
+            $_SESSION['user_id'] = $userId;
+            header('Location: swimming_packages.php');
+            exit();
         } else {
             $error = "Invalid username or password.";
         }
-    
+
         $stmt->close();
     } else {
         $error = "Failed to prepare the SQL statement: " . $conn->error;
     }
-    
 }
 
 $conn->close();
@@ -92,14 +84,10 @@ $conn->close();
         .notification.error {
             background-color: #f44336;
         }
-
-        .hidden-admin {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
     </style>
+    
 </head>
+
 <body>
 
 <div class="container mt-5">
@@ -109,7 +97,7 @@ $conn->close();
             <?php if (!empty($error)): ?>
                 <div class="alert alert-danger"><?php echo $error; ?></div>
             <?php endif; ?>
-            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+            <form method="POST" action="">
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
                     <input type="text" id="username" name="username" class="form-control" required>
@@ -118,14 +106,10 @@ $conn->close();
                     <label for="password" class="form-label">Password</label>
                     <input type="password" id="password" name="password" class="form-control" required>
                 </div>
-                <div class="hidden-admin">
-                    <input type="checkbox" id="is_admin" name="is_admin">
-                    <label for="is_admin"></label>
-                </div>
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>
             <div class="register-link">
-                <p>Don't have an account? <a href="register.php">Register</a></p>
+                <p>Don't have an account? <a href="register.php">register</a></p>
             </div>
             <div class="forgot-password-link">
                 <p>Forgot your password? <a href="forgot_password.php">Reset Password</a></p>

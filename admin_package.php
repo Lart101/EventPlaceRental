@@ -5,8 +5,7 @@ $conn = new mysqli("localhost", "root", "", "event_store");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['admin_id'])) {
     header('Location: login.php');
     exit();
 }

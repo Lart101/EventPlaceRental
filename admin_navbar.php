@@ -40,16 +40,7 @@
         display: block;
     }
 
-    .close {
-        position: absolute;
-        top: 20px;
-        right: 30px;
-        color: #fff;
-        font-size: 30px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
+   
     /* NavBar to Repa */
 
     .navbar {
@@ -130,9 +121,18 @@
                         <li class="nav-item">
                             <a class="nav-link" href="AdminUserAccPanel.php">User</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_account.php">Admin</a>
+                        </li>
+                       
+                        <li class="nav-item">
+                            <a class="nav-link" href="report.php">Report</a>
+                        </li>
+                
+
                         <?php
 
-                        if (!isset($_SESSION['user_id'])):
+                        if (!isset($_SESSION['admin_id'])):
                             ?>
 
                             <li class="nav-item login">

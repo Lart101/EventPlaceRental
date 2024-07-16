@@ -122,6 +122,7 @@ $conn->close();
                             <li><a class="dropdown-item" href="gallery.php">Gallery</a></li>
                             <li><a class="dropdown-item" href="ameneties.php">Amenities</a></li>
                             <li><a class="dropdown-item" href="contactmain.php">Contact</a></li>
+                            <li><a class="dropdown-item" href="feedback.php">Feedback</a></li>
                             
                            
                         </ul>
