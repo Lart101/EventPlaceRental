@@ -48,6 +48,14 @@ $sql_denied = "SELECT pr.*, u.username, sp.package_name, sp.package_type, pr.sta
 $result_denied = $conn->query($sql_denied);
 
 
+$sql_cancelled = "SELECT pr.*, u.username, sp.package_name, sp.package_type, pr.start_date, pr.end_date
+        FROM package_reservations pr
+        JOIN users u ON pr.user_id = u.id
+        JOIN swimming_packages sp ON pr.package_id = sp.id
+        WHERE pr.status = 'Cancelled'
+        ORDER BY pr.start_date ASC, pr.created_at ASC";
+$result_cancelled = $conn->query($sql_cancelled);
+
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
 
@@ -161,6 +169,10 @@ $conn->close();
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="denied-tab" data-bs-toggle="tab" data-bs-target="#denied" type="button"
                     role="tab" aria-controls="denied" aria-selected="false">Denied Reservations</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="denied-tab" data-bs-toggle="tab" data-bs-target="#cancelled" type="button"
+                    role="tab" aria-controls="denied" aria-selected="false">Cancelled Reservations</button>
             </li>
         </ul>
 
@@ -308,6 +320,42 @@ $conn->close();
                     </tbody>
                 </table>
             </div>
+
+            <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Username</th>
+                <th>Package</th>
+                <th>Package Type</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Proof of Payment</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            $rank = 1;
+            while ($row = $result_cancelled->fetch_assoc()) {
+                echo '<tr>';
+                echo '<td>' . ordinal_suffix($rank) . '</td>'; // Display ranking as ordinal (1st, 2nd, 3rd, etc.)
+                echo '<td>' . htmlspecialchars($row['username']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['package_name']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['package_type']) . '</td>';
+                echo '<td>' . date('Y-m-d', strtotime($row['start_date'])) . '</td>';
+                echo '<td>' . date('Y-m-d', strtotime($row['end_date'])) . '</td>';
+                echo '<td><a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" data-id="' . $row['id'] . '">View</a></td>';
+                echo '<td>';
+                echo '</td>';
+                echo '</tr>';
+                $rank++;
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
+
 
 
 

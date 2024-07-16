@@ -294,8 +294,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
     </div>
 
     <?php
-    // Function to display reservations based on status
-    // Function to display reservations based on status
+
 function displayReservationsByStatus($reservations, $status)
 {
     echo '<div class="mt-3">';
