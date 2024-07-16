@@ -16,12 +16,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create"])) {
     $full_name = $_POST["full_name"];
     $email = $_POST["email"];
 
-    $check_username_sql = "SELECT * FROM adminaccount WHERE username = '$username'";
-    $result = $conn->query($check_username_sql);
+    // Check if the email already exists
+    $check_email_sql = "SELECT * FROM adminaccount WHERE email = '$email'";
+    $result = $conn->query($check_email_sql);
 
     if ($result->num_rows > 0) {
-        $message = "Username '$username' already exists. Please choose a different username.";
+        $message = "Email '$email' already exists. Please choose a different email.";
     } else {
+        // Insert the admin account if email does not exist
         $sql = "INSERT INTO adminaccount (username, password, full_name, email)
                 VALUES ('$username', '$password', '$full_name', '$email')";
 

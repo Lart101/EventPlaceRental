@@ -10,26 +10,26 @@ if (isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Database connection
+
 $conn = new mysqli("localhost", "root", "", "event_store");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Error message variable
+
 $error = '';
 
-// Handling form submission
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
     $isAdmin = isset($_POST['is_admin']);
 
     if ($isAdmin) {
-        // Check admin credentials
+       
         $sql = "SELECT id, password FROM adminaccount WHERE username = ?";
     } else {
-        // Check regular user credentials
+      
         $sql = "SELECT id, password FROM users WHERE username = ?";
     }
     
@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_result($userId, $storedPassword);
     
         if ($stmt->fetch()) {
-            // Compare the entered password with the stored password (plaintext comparison)
+          
             if ($password === $storedPassword) {
                 if ($isAdmin) {
                     $_SESSION['admin_id'] = $userId;
