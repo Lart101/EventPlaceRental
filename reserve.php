@@ -6,13 +6,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Database connection
-$conn = new mysqli("localhost", "root", "", "event_store");
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userId = $_SESSION['user_id'];

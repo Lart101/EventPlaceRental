@@ -152,10 +152,9 @@ if ($stmt) {
                             <li><a class="dropdown-item" href="admin_reviews.php">Reviews</a></li>
                             <li><a class="dropdown-item" href="AdminUserAccPanel.php">User</a></li>
                             <li><a class="dropdown-item" href="admin_account.php">Admin</a></li>
-                            <li><a class="dropdown-item" href="gallery.php">Gallery</a></li>
+                           
                             <li><a class="dropdown-item" href="admin_gallery.php">Gallery</a></li>
-                            <li><a class="dropdown-item" href="contactmain.php">Contact</a></li>
-                            <li><a class="dropdown-item" href="feedback.php">Feedback</a></li>
+                    
 
 
                         </ul>

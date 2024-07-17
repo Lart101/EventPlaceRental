@@ -5,12 +5,7 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit();
 }
-
-$conn = new mysqli("localhost", "root", "", "event_store");
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require 'config.php';
 
 $user_id = $_SESSION['user_id'];
 

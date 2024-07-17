@@ -2,10 +2,7 @@
 session_start();
 
 
-$host = 'localhost';
-$dbname = 'event_store';
-$username = 'root';
-$password = '';
+require 'config.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;

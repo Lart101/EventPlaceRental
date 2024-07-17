@@ -11,10 +11,7 @@ if (isset($_SESSION['user_id'])) {
 }
 
 
-$conn = new mysqli("localhost", "root", "", "event_store");
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require 'config.php';
 
 
 $error = '';
