@@ -13,19 +13,19 @@ $sql = "SELECT username FROM adminaccount WHERE id = ?";
 $stmt = $conn->prepare($sql);
 
 if ($stmt) {
-    
+
     $stmt->bind_param("i", $_SESSION['admin_id']);
 
-   
+
     $stmt->execute();
 
-    
+
     $stmt->bind_result($username);
 
-   
+
     $stmt->fetch();
 
-   
+
     $stmt->close();
 }
 
@@ -70,7 +70,7 @@ if ($stmt) {
         display: block;
     }
 
-   
+
     /* NavBar to Repa */
 
     .navbar {
@@ -118,84 +118,83 @@ if ($stmt) {
         color: #fff;
         background-color: #dc3545;
     }
-    
-       
-   
 </style>
 
 <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container-lg">
-            <a class="navbar-brand" style=" color: black;">
-                <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
-                Board Mart Admin
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="mx-auto">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin_package.php">Package</a>
+    <div class="container-lg">
+        <a class="navbar-brand" style=" color: black;">
+            <img src="img\profile\logo.jpg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            Board Mart Admin
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="mx-auto">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin_package.php">Package</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin_reservations.php">Reservation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="report.php">Report</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            More
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="admin_reviews.php">Reviews</a></li>
+                            <li><a class="dropdown-item" href="AdminUserAccPanel.php">User</a></li>
+                            <li><a class="dropdown-item" href="admin_account.php">Admin</a></li>
+                            <li><a class="dropdown-item" href="gallery.php">Gallery</a></li>
+                            <li><a class="dropdown-item" href="admin_gallery.php">Gallery</a></li>
+                            <li><a class="dropdown-item" href="contactmain.php">Contact</a></li>
+                            <li><a class="dropdown-item" href="feedback.php">Feedback</a></li>
+
+
+                        </ul>
+                    </li>
+
+
+
+
+
+                    <?php
+
+                    if (!isset($_SESSION['admin_id'])):
+                        ?>
+
+                        <li class="nav-item login">
+                            <a class="nav-link" href="login.php">Login</a>
                         </li>
+                    <?php else: ?>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin_reservations.php">Reservation</a>
+                        <li class="nav-item logout">
+                            <form action="logout.php" method="POST">
+                                <button type="submit" class="nav-link btn btn-link"
+                                    onclick="return confirmLogout()">Logout</button>
+                            </form>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="admin_reviews.php">Reviews</a>
+                            <span class="nav-link">Welcome, <?php echo htmlspecialchars($username); ?>!</span>
                         </li>
-
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="AdminUserAccPanel.php">User</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin_account.php">Admin</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin_gallery.php">Gallery</a>
-                        </li>
-                
-
-                       
-                        <li class="nav-item">
-                            <a class="nav-link" href="report.php">Report</a>
-                        </li>
-                
-
-                        <?php
-
-                        if (!isset($_SESSION['admin_id'])):
-                            ?>
-
-                            <li class="nav-item login">
-                                <a class="nav-link" href="login.php">Login</a>
-                            </li>
-                        <?php else: ?>
-
-                            <li class="nav-item logout">
-                                <form action="logout.php" method="POST">
-                                    <button type="submit" class="nav-link btn btn-link"
-                                        onclick="return confirmLogout()">Logout</button>
-                                </form>
-                            </li>
-                            <li class="nav-item">
-                    <span class="nav-link">Welcome, <?php echo htmlspecialchars($username); ?>!</span>
-                </li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
+                    <?php endif; ?>
+                </ul>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <script>
-          
+<script>
+
 
     function confirmLogout() {
         return confirm('Are you sure you want to logout?');
     }
 </script>
-   
