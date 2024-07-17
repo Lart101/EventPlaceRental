@@ -43,7 +43,8 @@ while ($stmt_reserved->fetch()) {
 }
 
 $stmt_reserved->close();
-function isDateReserved($conn, $packageId, $startDate) {
+function isDateReserved($conn, $packageId, $startDate)
+{
     $sql = "SELECT COUNT(*) as count FROM package_reservations 
             WHERE package_id = ? 
             AND start_date = ? 
@@ -59,10 +60,10 @@ function isDateReserved($conn, $packageId, $startDate) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $packageId = $_POST['package_id'];
     $startDate = $_POST['start_date'];
-    
+
     if (isDateReserved($conn, $packageId, $startDate)) {
         echo "The selected start date is already reserved. Please choose a different date.";
-    } 
+    }
 }
 if (!empty($errorMsg)): ?>
     <div class="alert alert-danger">
@@ -200,7 +201,7 @@ $conn->close();
                 <p><strong>Price:</strong> <?php echo htmlspecialchars($price); ?></p>
                 <p><strong>Duration:</strong> <?php echo htmlspecialchars($duration); ?></p>
                 <p><strong>Max Pax:</strong> <?php echo htmlspecialchars($max_pax); ?></p>
-                <form method="POST" action="showinfo.php">
+                <form method="POST" action="showinfo.php" >
 
                     <input type="hidden" name="package_id" value="<?php echo $packageId; ?>">
                     <input type="hidden" name="package_name" value="<?php echo htmlspecialchars($package_name); ?>">
@@ -212,8 +213,9 @@ $conn->close();
                     <div class="mb-3">
                         <label for="start_date" class="form-label">Start Date</label>
                         <input type="date" class="form-control" id="start_date" name="start_date" required>
+                       
                     </div>
-
+                   
                     <?php if ($package_type == 'Combo'): ?>
                         <div class="mb-3">
                             <label for="end_date" class="form-label">End Date</label>
@@ -353,73 +355,66 @@ $conn->close();
                 extendedStayHours.required = true;
             } else {
                 extendedStayHours.required = false;
-                extendedStayHours.value = ''; // Clear the input if the checkbox is unchecked
+                extendedStayHours.value = '';
             }
             calculateTotalPrice();
         }
     </script>
-  <script>
-    const startDateInput = document.getElementById('start_date');
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const formattedTomorrow = tomorrow.toISOString().split('T')[0];
-    startDateInput.setAttribute('min', formattedTomorrow);
-
-    
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
+    <script>
         const startDateInput = document.getElementById('start_date');
-        const endDateInput = document.getElementById('end_date');
-
-        // Function to calculate the date one day after a given date
-        function getNextDay(date) {
-            const nextDay = new Date(date);
-            nextDay.setDate(nextDay.getDate() + 1);
-            return nextDay.toISOString().split('T')[0];
-        }
-
-        // Function to enable/disable end date based on start date selection
-        function toggleEndDate() {
-            if (startDateInput.value) {
-                endDateInput.disabled = false; // Enable end date input
-                endDateInput.min = getNextDay(startDateInput.value); // Set minimum date for end date
-            } else {
-                endDateInput.disabled = true; // Disable end date input
-                endDateInput.value = ''; // Reset end date value
-            }
-        }
-
-        // Event listener on start date input
-        startDateInput.addEventListener('change', function () {
-            toggleEndDate();
-        });
-
-        // Event listener on end date input to prevent selecting a date before the minimum required date
-        endDateInput.addEventListener('change', function () {
-            if (endDateInput.value < getNextDay(startDateInput.value)) {
-                endDateInput.value = getNextDay(startDateInput.value);
-            }
-        });
-
-        // Ensure start date cannot be a past date
         const today = new Date();
-        today.setDate(today.getDate() + 1); // Set today to tomorrow's date
-        const formattedTomorrow = today.toISOString().split('T')[0];
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const formattedTomorrow = tomorrow.toISOString().split('T')[0];
         startDateInput.setAttribute('min', formattedTomorrow);
 
-        // Additional event listener to clear end date if start date changes
-        startDateInput.addEventListener('input', function () {
-            endDateInput.value = ''; // Clear end date value
-            toggleEndDate(); // Update end date input state
-        });
 
-        // Initial setup based on start date value
-        toggleEndDate();
-    });
-</script>
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const startDateInput = document.getElementById('start_date');
+            const endDateInput = document.getElementById('end_date');
+
+
+            function getNextDay(date) {
+                const nextDay = new Date(date);
+                nextDay.setDate(nextDay.getDate() + 1);
+                return nextDay.toISOString().split('T')[0];
+            }
+
+
+            const today = new Date().toISOString().split('T')[0];
+            startDateInput.setAttribute('min', today);
+
+            n
+            function toggleEndDate() {
+                if (startDateInput.value) {
+                    endDateInput.disabled = false;
+                    endDateInput.min = getNextDay(startDateInput.value);
+                } else {
+                    endDateInput.disabled = true;
+                    endDateInput.value = '';
+                }
+            }
+
+
+            startDateInput.addEventListener('change', function () {
+                toggleEndDate();
+            });
+
+
+            endDateInput.addEventListener('change', function () {
+                if (endDateInput.value < getNextDay(startDateInput.value)) {
+                    endDateInput.value = getNextDay(startDateInput.value);
+                }
+            });
+
+
+            toggleEndDate();
+        });
+    </script>
+
 
 
 

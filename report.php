@@ -35,8 +35,15 @@ $reviewsSummary = $conn->query("
 
 $usersSummary = $conn->query("SELECT COUNT(*) as count, gender FROM users GROUP BY gender");
 
+// Sales summary queries
+$weeklySales = $conn->query("SELECT SUM(total_price) as total FROM package_reservations WHERE YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)")->fetch_assoc();
+$monthlySales = $conn->query("SELECT SUM(total_price) as total FROM package_reservations WHERE YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())")->fetch_assoc();
+$yearlySales = $conn->query("SELECT SUM(total_price) as total FROM package_reservations WHERE YEAR(created_at) = YEAR(CURDATE())")->fetch_assoc();
+
 $conn->close();
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -112,6 +119,18 @@ $conn->close();
                     <div class="card-header">Reviews Summary</div>
                     <div class="card-body">
                         <canvas id="reviewsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Summary Section -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Sales Summary</div>
+                    <div class="card-body">
+                        <canvas id="salesChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -226,8 +245,36 @@ $conn->close();
             type: 'doughnut',
             data: reviewsData
         });
+
+        // Sales Summary Chart
+        var salesCtx = document.getElementById('salesChart').getContext('2d');
+        var salesData = {
+            labels: ['Weekly Sales', 'Monthly Sales', 'Yearly Sales'],
+            datasets: [{
+                label: 'Sales (PHP)',
+                data: [
+                    <?php echo $weeklySales['total']; ?>,
+                    <?php echo $monthlySales['total']; ?>,
+                    <?php echo $yearlySales['total']; ?>
+                ],
+                backgroundColor: [
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(54, 162, 235, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(54, 162, 235, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+        var salesChart = new Chart(salesCtx, {
+            type: 'bar',
+            data: salesData
+        });
     });
     </script>
 </body>
 </html>
-    
