@@ -88,33 +88,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
     $duration = $_POST["duration"];
     $max_pax = $_POST["max_pax"];
     $inclusions = $_POST["inclusions"];
+    $package_type = $_POST["package_type"]; // Make sure to retrieve package_type
 
-    $profile_image = !empty($_FILES["profile_image"]["name"]) ? uploadImage($_FILES["profile_image"]) : false;
-    $multiple_images = !empty($_FILES["multiple_images"]["name"][0]) ? uploadImage($_FILES["multiple_images"], true) : false;
-    $package_type = $_POST["package_type"];
-    // Add $package_type to your UPDATE SQL query
-    $sql = "UPDATE swimming_packages SET package_name='$package_name', price='$price', duration='$duration', max_pax='$max_pax', inclusions='$inclusions', profile_image='$profile_image', multiple_images='$multiple_images', package_type='$package_type' WHERE id=$id";
-
-
-
-    if ($profile_image !== false && !empty($multiple_images)) {
-        $multiple_images = implode(',', $multiple_images);
-        $sql = "UPDATE swimming_packages SET package_name='$package_name', price='$price', duration='$duration', max_pax='$max_pax', inclusions='$inclusions', profile_image='$profile_image', multiple_images='$multiple_images' WHERE id=$id";
-    } elseif ($profile_image !== false) {
-        $sql = "UPDATE swimming_packages SET package_name='$package_name', price='$price', duration='$duration', max_pax='$max_pax', inclusions='$inclusions', profile_image='$profile_image' WHERE id=$id";
-    } elseif (!empty($multiple_images)) {
-        $multiple_images = implode(',', $multiple_images);
-        $sql = "UPDATE swimming_packages SET package_name='$package_name', price='$price', duration='$duration', max_pax='$max_pax', inclusions='$inclusions', multiple_images='$multiple_images' WHERE id=$id";
-    } else {
-        $sql = "UPDATE swimming_packages SET package_name='$package_name', price='$price', duration='$duration', max_pax='$max_pax', inclusions='$inclusions' WHERE id=$id";
+    // Handle profile image upload if a new file is selected
+    if (!empty($_FILES["profile_image"]["name"])) {
+        $profile_image = uploadImage($_FILES["profile_image"]);
+        if ($profile_image === false) {
+            $message = "Error uploading profile image.";
+        }
     }
 
+    // Handle multiple images upload if new files are selected
+    if (!empty($_FILES["multiple_images"]["name"][0])) {
+        $multiple_images = uploadImage($_FILES["multiple_images"], true);
+        if ($multiple_images === false) {
+            $message = "Error uploading multiple images.";
+        } else {
+            $multiple_images = implode(',', $multiple_images);
+        }
+    }
+
+    // Build SQL query based on what fields need to be updated
+    $sql = "UPDATE swimming_packages SET package_name='$package_name', price='$price', duration='$duration', max_pax='$max_pax', inclusions='$inclusions'";
+    
+    // Append profile_image and multiple_images to SQL query if they are set
+    if (isset($profile_image)) {
+        $sql .= ", profile_image='$profile_image'";
+    }
+    if (isset($multiple_images)) {
+        $sql .= ", multiple_images='$multiple_images'";
+    }
+    
+    // Always update package_type in the query
+    $sql .= ", package_type='$package_type' WHERE id=$id";
+
+    // Execute the SQL query
     if ($conn->query($sql) === TRUE) {
         $message = "Package updated successfully";
     } else {
         $message = "Error updating package: " . $conn->error;
     }
 }
+
 
 // Delete operation
 if (isset($_GET['delete'])) {
