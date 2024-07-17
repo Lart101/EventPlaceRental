@@ -358,54 +358,69 @@ $conn->close();
             calculateTotalPrice();
         }
     </script>
-    <script>
+  <script>
+    const startDateInput = document.getElementById('start_date');
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const formattedTomorrow = tomorrow.toISOString().split('T')[0];
+    startDateInput.setAttribute('min', formattedTomorrow);
+
+    
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
         const startDateInput = document.getElementById('start_date');
-        const today = new Date().toISOString().split('T')[0];
-        startDateInput.setAttribute('min', today);
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const startDateInput = document.getElementById('start_date');
-            const endDateInput = document.getElementById('end_date');
+        const endDateInput = document.getElementById('end_date');
 
-            // Function to enable/disable end date based on start date selection
-            function toggleEndDate() {
-                if (startDateInput.value) {
-                    endDateInput.disabled = false; // Enable end date input
-                    endDateInput.min = startDateInput.value; // Set minimum date for end date
-                } else {
-                    endDateInput.disabled = true; // Disable end date input
-                    endDateInput.value = ''; // Reset end date value
-                }
+        // Function to calculate the date one day after a given date
+        function getNextDay(date) {
+            const nextDay = new Date(date);
+            nextDay.setDate(nextDay.getDate() + 1);
+            return nextDay.toISOString().split('T')[0];
+        }
+
+        // Function to enable/disable end date based on start date selection
+        function toggleEndDate() {
+            if (startDateInput.value) {
+                endDateInput.disabled = false; // Enable end date input
+                endDateInput.min = getNextDay(startDateInput.value); // Set minimum date for end date
+            } else {
+                endDateInput.disabled = true; // Disable end date input
+                endDateInput.value = ''; // Reset end date value
             }
+        }
 
-            // Event listener on start date input
-            startDateInput.addEventListener('change', function () {
-                toggleEndDate();
-            });
-
-            // Event listener on end date input to prevent selecting a date before start date
-            endDateInput.addEventListener('change', function () {
-                if (endDateInput.value < startDateInput.value) {
-                    endDateInput.value = startDateInput.value;
-                }
-            });
-
-            // Ensure start date cannot be a past date
-            const today = new Date().toISOString().split('T')[0];
-            startDateInput.setAttribute('min', today);
-
-            // Additional event listener to clear end date if start date changes
-            startDateInput.addEventListener('input', function () {
-                endDateInput.value = ''; // Clear end date value
-                toggleEndDate(); // Update end date input state
-            });
-
-            // Initial setup based on start date value
+        // Event listener on start date input
+        startDateInput.addEventListener('change', function () {
             toggleEndDate();
         });
-    </script>
-   
+
+        // Event listener on end date input to prevent selecting a date before the minimum required date
+        endDateInput.addEventListener('change', function () {
+            if (endDateInput.value < getNextDay(startDateInput.value)) {
+                endDateInput.value = getNextDay(startDateInput.value);
+            }
+        });
+
+        // Ensure start date cannot be a past date
+        const today = new Date();
+        today.setDate(today.getDate() + 1); // Set today to tomorrow's date
+        const formattedTomorrow = today.toISOString().split('T')[0];
+        startDateInput.setAttribute('min', formattedTomorrow);
+
+        // Additional event listener to clear end date if start date changes
+        startDateInput.addEventListener('input', function () {
+            endDateInput.value = ''; // Clear end date value
+            toggleEndDate(); // Update end date input state
+        });
+
+        // Initial setup based on start date value
+        toggleEndDate();
+    });
+</script>
+
 
 
     <script>

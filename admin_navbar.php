@@ -154,6 +154,11 @@ if ($stmt) {
                         <li class="nav-item">
                             <a class="nav-link" href="admin_account.php">Admin</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_gallery.php">Gallery</a>
+                        </li>
+                
+
                        
                         <li class="nav-item">
                             <a class="nav-link" href="report.php">Report</a>

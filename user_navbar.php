@@ -83,7 +83,8 @@ $conn->close();
         background-color: #dc3545;
     }
 </style>
-
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
 <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container-lg">
         <a class="navbar-brand" href="index.html">

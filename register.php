@@ -376,10 +376,12 @@ $conn->close();
             var firstName = document.getElementById('first_name').value;
             var middleName = document.getElementById('middle_name').value;
             var lastName = document.getElementById('last_name').value;
+      
 
             var firstNameError = document.getElementById('firstNameError');
             var middleNameError = document.getElementById('middleNameError');
             var lastNameError = document.getElementById('lastNameError');
+            
 
 
 
@@ -388,13 +390,14 @@ $conn->close();
             var confirmPassword = document.getElementById('confirmPassword').value;
             var email = document.getElementById('email').value;
             var contactNumber = document.getElementById('contact_number').value;
-
+            var city = document.getElementById('city').value;
 
             var passwordError = document.getElementById('passwordError');
             var confirmPasswordError = document.getElementById('confirmPasswordError');
             var emailError = document.getElementById('emailError');
             var ageError = document.getElementById('ageError');
             var contactNumberError = document.getElementById('contactNumberError');
+            var cityError = document.getElementById('cityError');
 
             var isValid = true;
 
@@ -467,7 +470,7 @@ $conn->close();
 
             var contactNumberPattern = /^\d{10}$/;
             if (!contactNumberPattern.test(contactNumber)) {
-                contactNumberError.textContent = 'Contact number must be 10 digits.';
+                contactNumberError.textContent = 'Contact number must be 10 digits. and number only';
                 contactNumberError.style.display = 'block';
                 isValid = false;
             } else {
@@ -480,7 +483,7 @@ $conn->close();
                 cityError.style.display = 'block';
                 isValid = false;
             } else {
-                lastNameError.style.display = 'none';
+                cityError.style.display = 'none';
             }
 
             var terms = document.getElementById('terms').checked;

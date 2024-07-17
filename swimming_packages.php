@@ -61,7 +61,7 @@ if (!isset($_SESSION['user_id'])) {
         </div>
     </section>
 
-    <div class="container">
+    <div class="container" id="nature-of-business">
         <section id="packages" class="py-5 fade-in">
             <div class="container">
                 <h1 class="my-4 text-center">Our Packages</h1>
@@ -86,7 +86,7 @@ if (!isset($_SESSION['user_id'])) {
                                 echo '</div>'; // Close the previous type's container
                             }
                             $current_type = $row['package_type'];
-                            echo '<div class="row">
+                            echo '<div class="row" >
                                     <div class="col-12">
                                         <h2 class="my-4">' . $current_type . ' Packages</h2>
                                     </div>
