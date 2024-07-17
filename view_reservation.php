@@ -103,7 +103,7 @@ $conn->close();
 <body>
     <?php include 'user_navbar.php'; ?>
 
-    <div class="container">
+    <div class="container" style="margin-top:5%;">
         <div class="receipt">
             <div class="receipt-header">
                 <h2>Reservation Receipt</h2>
@@ -113,11 +113,11 @@ $conn->close();
                 <!-- Display reservation details -->
                 <p><strong>Reservation ID:</strong> <?php echo $reservation_id; ?></p>
                 <p><strong>Package Name:</strong> <?php echo $package_name; ?></p>
-                <p><strong>Price per Pax:</strong> PHP <?php echo $price; ?></p>
+                <p><strong>Price per Pax:</strong> ₱ <?php echo $price; ?></p>
                 <p><strong>Start Date:</strong> <?php echo $start_date; ?></p>
                 <p><strong>End Date:</strong> <?php echo $end_date; ?></p>
                 <p><strong>Created At:</strong> <?php echo $created_at; ?></p>
-                <p><strong>Total Price:</strong> PHP <?php echo $total_price; ?></p>
+                <p><strong>Total Price:</strong> ₱ <?php echo $total_price; ?></p>
                 <p><strong>Status:</strong> <?php echo $status; ?></p>
                 <p><strong>Add-ons:</strong> <?php echo $add_ons; ?></p>
                 <p><strong>Extend Stay:</strong> <?php echo $extend_stay; ?></p>

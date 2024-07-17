@@ -218,7 +218,7 @@ $conn->close();
                     </div>
 
                     <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required placeholder="Enter your email"
+                    <input type="text" id="email" name="email" required placeholder="Enter your email"
                         value="<?php echo htmlspecialchars($email); ?>">
                     <span id="emailError" class="error-message"></span>
 
@@ -472,6 +472,15 @@ $conn->close();
                 isValid = false;
             } else {
                 contactNumberError.style.display = 'none';
+            }
+
+
+            if (!namePattern.test(city)) {
+                cityError.textContent = 'City must contain only letters and spaces.';
+                cityError.style.display = 'block';
+                isValid = false;
+            } else {
+                lastNameError.style.display = 'none';
             }
 
             var terms = document.getElementById('terms').checked;

@@ -64,7 +64,7 @@ if (!isset($_SESSION['user_id'])) {
             
             <p class="card-text">Thank you for making a reservation with us.</p>
             <p>A receipt has been sent to your provided email address, if valid.</p>
-            <p>You can view your reservation details in <a href="profilecopy.php">Profile</a>.</p>
+            <p>You can view your reservation details and receipt in <a href="profilecopy.php">Profile</a>.</p>
             <a href="index1.php" class="btn btn-lg btn-primary btn-back">Back to Home</a>
         </div>
     </div>
