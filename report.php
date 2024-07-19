@@ -35,14 +35,13 @@ $reviewsSummary = $conn->query("
 
 $usersSummary = $conn->query("SELECT COUNT(*) as count, gender FROM users GROUP BY gender");
 
-// Sales summary queries
-$weeklySales = $conn->query("SELECT SUM(total_price) as total FROM package_reservations WHERE YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)")->fetch_assoc();
-$monthlySales = $conn->query("SELECT SUM(total_price) as total FROM package_reservations WHERE YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())")->fetch_assoc();
-$yearlySales = $conn->query("SELECT SUM(total_price) as total FROM package_reservations WHERE YEAR(created_at) = YEAR(CURDATE())")->fetch_assoc();
+// Sales summary queries for only accepted reservations
+$weeklySales = $conn->query("SELECT SUM(total_price) as total FROM package_reservations WHERE status = 'Accepted' AND YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)")->fetch_assoc();
+$monthlySales = $conn->query("SELECT SUM(total_price) as total FROM package_reservations WHERE status = 'Accepted' AND YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())")->fetch_assoc();
+$yearlySales = $conn->query("SELECT SUM(total_price) as total FROM package_reservations WHERE status = 'Accepted' AND YEAR(created_at) = YEAR(CURDATE())")->fetch_assoc();
 
 $conn->close();
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
