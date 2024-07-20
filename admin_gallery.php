@@ -12,7 +12,7 @@ require 'config.php';
 
 $message = "";
 
-// Handle Create or Update (handling both scenarios with one block)
+
 if (isset($_POST['add']) || isset($_POST['update'])) {
     $id = isset($_POST['id']) ? $_POST['id'] : null;
     $title = mysqli_real_escape_string($conn, $_POST['title']);
