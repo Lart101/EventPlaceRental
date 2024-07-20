@@ -92,7 +92,7 @@ function displayImage($imageData, $title)
 <body>
     <?php include 'admin_navbar.php'; ?>
 
-    <div class="container mt-5" style="width:800px">
+    <div class="container mt-5" style="width:800px;">
         <div class="row">
             <div class="col-md-8">
                 <!-- Add New Gallery Item Modal -->
@@ -261,7 +261,7 @@ function displayImage($imageData, $title)
 
 
                 <!-- Gallery Items Table -->
-                <div class="row mt-5" style="width: 800px">
+                <div class="row mt-5" style="width: 800px;">
                     <div class="col-md-12">
                         <h2>Gallery Items</h2>
                         <?php if ($message != "")
